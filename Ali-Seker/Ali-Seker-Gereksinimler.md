@@ -16,3 +16,5 @@ Bu dosyada, LingoLearn (İngilizce Öğrenme Platformu) projesinde şahsım tara
   - **Açıklama:** Kullanıcının bir İngilizce dersine veya içeriğine yaptığı değerlendirme yorumunu siteden tamamen kaldırması.
 - **Sertifikaları Görme** (GET API Metodu)
   - **Açıklama:** Başarıyla bitirilen İngilizce eğitimlerinin dijital başarı belgelerinin kullanıcıya sunulması.
+- **Yapay Zeka ile İngilizce Pratiği Yapma (+5 Puanlık Gereksinim)** (POST API Metodu)
+  - **Açıklama:** Kullanıcının yazdığı İngilizce cümlelerin yapay zeka tarafından incelenip hatalarının düzeltilmesi ve geri bildirim verilmesi.
