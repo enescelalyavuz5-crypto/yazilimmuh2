@@ -4,3 +4,5 @@ Bu dosyada, LingoLearn (İngilizce Öğrenme Platformu) projesinde şahsım tara
 
 - **Kursa Katılma** (POST API Metodu)
   - **Açıklama:** Kullanıcının belirlediği bir İngilizce eğitim seviyesi kuruna kayıt olması.
+- **Sınav Sonucu Ekleme** (POST API Metodu)
+  - **Açıklama:** Çözülen İngilizce deneme sınavı puanlarının ve cevaplarının hesaba kaydedilmesi.
