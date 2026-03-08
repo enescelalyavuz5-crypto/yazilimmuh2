@@ -1,6 +1,6 @@
 # Enes Celal Yavuz - Gereksinim Analizi
 
-Bu dosyada, LingoLearn (İngilizce Öğrenme Platformu) projesinde şahsım tarafından üstlenilmiş olan fonksiyonel gereksinimler yer almaktadır. Tüm gereksinimler, eylem bildiren isimlerle adlandırılmış ve teknik jargon içermeyen tanımlamalarla açıklanmıştır.
+Bu dosyada, FluentBee (İngilizce Öğrenme Platformu) projesinde şahsım tarafından üstlenilmiş olan fonksiyonel gereksinimler yer almaktadır. Tüm gereksinimler, eylem bildiren isimlerle adlandırılmış ve teknik jargon içermeyen tanımlamalarla açıklanmıştır.
 
 - **Öğrenci Kayıt Olma** (POST API Metodu)
   - **Açıklama:** Sisteme yeni bir kullanıcı hesabının oluşturulması.

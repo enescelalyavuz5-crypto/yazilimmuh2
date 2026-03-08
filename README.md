@@ -1,4 +1,8 @@
-# LingoLearn (İngilizce Öğrenme Platformu)
+<p align="center">
+  <img src="fluentbee-banner.png" alt="FluentBee Banner" width="100%">
+</p>
+
+# FluentBee (İngilizce Öğrenme Platformu)
 
 Bu proje, Yazılım Mühendisliği dersi kapsamında geliştirilmiş bir İngilizce öğrenme ve pratik yapma platformudur. Sistem, öğrencilerin online olarak İngilizce eğitimleri almasını, kelime dağarcığını geliştirmesini, kendilerini test etmelerini ve yapay zeka destekli dilbilgisi geri bildirimleri almasını sağlamaktadır.
 
@@ -9,7 +13,8 @@ Bu proje, Yazılım Mühendisliği dersi kapsamında geliştirilmiş bir İngili
 - **Yapay Zeka:** OpenAI API / Gemini API
 
 ## Genel Konsept
-LingoLearn, kullanıcıların seviyelerine uygun İngilizce dersleri alabildiği, kelime listeleri oluşturabildiği, sınavlarla kendilerini test edebildiği ve yapay zeka destekli İngilizce pratiği yapabildiği modern bir web platformudur.
+FluentBee, kullanıcıların seviyelerine uygun İngilizce dersleri alabildiği, kelime listeleri oluşturabildiği, sınavlarla kendilerini test edebildiği ve yapay zeka destekli İngilizce pratiği yapabildiği modern bir web platformudur.
+
 
 ## Dokümantasyon
 
