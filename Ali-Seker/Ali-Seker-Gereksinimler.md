@@ -8,3 +8,5 @@ Bu dosyada, LingoLearn (İngilizce Öğrenme Platformu) projesinde şahsım tara
   - **Açıklama:** Çözülen İngilizce deneme sınavı puanlarının ve cevaplarının hesaba kaydedilmesi.
 - **Sınavları Listeleme** (GET API Metodu)
   - **Açıklama:** Öğrencilerin İngilizce seviyelerini test edebilecekleri uygun sınavların dökümünün yapılması.
+- **Sınav Puanı Güncelleme** (PUT API Metodu)
+  - **Açıklama:** Kullanıcının daha önce çözdüğü bir testi yeniden çözmesi durumunda güncel puanının değiştirilmesi.
