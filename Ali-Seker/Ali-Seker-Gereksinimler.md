@@ -6,3 +6,5 @@ Bu dosyada, LingoLearn (İngilizce Öğrenme Platformu) projesinde şahsım tara
   - **Açıklama:** Kullanıcının belirlediği bir İngilizce eğitim seviyesi kuruna kayıt olması.
 - **Sınav Sonucu Ekleme** (POST API Metodu)
   - **Açıklama:** Çözülen İngilizce deneme sınavı puanlarının ve cevaplarının hesaba kaydedilmesi.
+- **Sınavları Listeleme** (GET API Metodu)
+  - **Açıklama:** Öğrencilerin İngilizce seviyelerini test edebilecekleri uygun sınavların dökümünün yapılması.
