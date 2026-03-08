@@ -1,0 +1,1371 @@
+openapi: 3.0.3
+info:
+  title: LingoLearn API
+  description: |
+    LingoLearn İngilizce Öğrenme Platformu için RESTful API.
+    
+    ## Özellikler
+    - Kullanıcı yönetimi (kayıt, profil güncelleme, hesap silme)
+    - Kelime yönetimi (listeleme, favori ekleme, silme)
+    - Ders ve kurs yönetimi
+    - Sınav işlemleri (listeleme, sonuç kaydetme, puan güncelleme)
+    - Öğrenme istatistikleri ve sertifikalar
+    - Yapay zeka destekli İngilizce pratiği
+    - JWT tabanlı kimlik doğrulama
+  version: 1.0.0
+  contact:
+    name: LingoLearn Destek Ekibi
+    email: destek@lingolearn.com
+    url: https://lingolearn.com/destek
+
+servers:
+  - url: https://api.lingolearn.com/v1
+    description: Production server
+  - url: http://localhost:5000/v1
+    description: Development server
+
+tags:
+  - name: auth
+    description: Kimlik doğrulama ve kullanıcı kayıt işlemleri
+  - name: users
+    description: Kullanıcı profil yönetimi işlemleri
+  - name: words
+    description: Kelime yönetimi işlemleri
+  - name: lessons
+    description: Ders ve kurs işlemleri
+  - name: exams
+    description: Sınav işlemleri
+  - name: statistics
+    description: İstatistik ve sertifika işlemleri
+  - name: comments
+    description: Yorum işlemleri
+  - name: ai
+    description: Yapay zeka destekli İngilizce pratiği
+
+paths:
+  # ============================================================
+  # ENES CELAL YAVUZ - GEREKSİNİMLER
+  # ============================================================
+
+  # 1. Öğrenci Kayıt Olma (POST)
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: Öğrenci Kayıt Olma
+      description: Sisteme yeni bir kullanıcı hesabının oluşturulması.
+      operationId: registerStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentRegistration'
+            examples:
+              example1:
+                summary: Örnek öğrenci kaydı
+                value:
+                  email: ogrenci@example.com
+                  password: Guvenli123!
+                  firstName: Enes
+                  lastName: Yavuz
+                  englishLevel: beginner
+      responses:
+        '201':
+          description: Kullanıcı başarıyla oluşturuldu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email adresi zaten kullanımda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # 2. Profil Güncelleme (PUT)
+  /users/{userId}/profile:
+    put:
+      tags:
+        - users
+      summary: Profil Güncelleme
+      description: Kullanıcının kendi ad, soyad ve şifre gibi kişisel bilgilerini değiştirmesi.
+      operationId: updateProfile
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+            examples:
+              example1:
+                summary: Profil güncelleme örneği
+                value:
+                  firstName: Enes Celal
+                  lastName: Yavuz
+                  password: YeniSifre456!
+      responses:
+        '200':
+          description: Profil başarıyla güncellendi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # 3. Kelimeleri Listeleme (GET)
+  /words:
+    get:
+      tags:
+        - words
+      summary: Kelimeleri Listeleme
+      description: Sistemdeki tüm İngilizce kelimelerin Türkçe anlamlarıyla birlikte liste halinde ekrana getirilmesi.
+      operationId: listWords
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: level
+          in: query
+          description: Seviyeye göre filtreleme
+          schema:
+            type: string
+            enum: [beginner, elementary, intermediate, upper-intermediate, advanced]
+        - name: search
+          in: query
+          description: Kelime arama
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Kelimeler başarıyla listelendi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WordList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # 4. Kelime Silme (DELETE)
+  /users/{userId}/favorite-words/{wordId}:
+    delete:
+      tags:
+        - words
+      summary: Kelime Silme
+      description: Kullanıcının kendi özel çalışma listesinden artık istemediği kelimeleri çıkarması.
+      operationId: removeFavoriteWord
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+        - $ref: '#/components/parameters/WordIdParam'
+      responses:
+        '204':
+          description: Kelime çalışma listesinden başarıyla silindi
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # 5. Dersleri Listeleme (GET)
+  /lessons:
+    get:
+      tags:
+        - lessons
+      summary: Dersleri Listeleme
+      description: İngilizce seviyelerine göre hazırlanmış ders modüllerinin seviye bazlı gösterilmesi.
+      operationId: listLessons
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: level
+          in: query
+          description: Seviyeye göre filtreleme
+          schema:
+            type: string
+            enum: [beginner, elementary, intermediate, upper-intermediate, advanced]
+      responses:
+        '200':
+          description: Dersler başarıyla listelendi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LessonList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # 6. Çalışma Hedefi Güncelleme (PUT)
+  /users/{userId}/study-goal:
+    put:
+      tags:
+        - users
+      summary: Çalışma Hedefi Güncelleme
+      description: Kullanıcının uygulama üzerinde belirlediği günlük hedef çalışma süresini yeniden ayarlaması.
+      operationId: updateStudyGoal
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudyGoalUpdate'
+            examples:
+              example1:
+                summary: Çalışma hedefi güncelleme
+                value:
+                  dailyGoalMinutes: 30
+      responses:
+        '200':
+          description: Çalışma hedefi başarıyla güncellendi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudyGoal'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # 7. Favori Kelime Ekleme (POST)
+  /users/{userId}/favorite-words:
+    post:
+      tags:
+        - words
+      summary: Favori Kelime Ekleme
+      description: Öğrencinin çalışma listesine yepyeni bir İngilizce kelime kaydetmesi.
+      operationId: addFavoriteWord
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FavoriteWordCreate'
+            examples:
+              example1:
+                summary: Favori kelime ekleme
+                value:
+                  wordId: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        '201':
+          description: Kelime çalışma listesine başarıyla eklendi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteWord'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Kelime zaten çalışma listesinde mevcut
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # 8. Öğrenme İstatistiklerini Görme (GET)
+  /users/{userId}/statistics:
+    get:
+      tags:
+        - statistics
+      summary: Öğrenme İstatistiklerini Görme
+      description: Öğrencinin kaç kelime ezberlediğine ve hangi dersleri bitirdiğine dair verilerin sunulması.
+      operationId: getLearningStatistics
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: İstatistikler başarıyla getirildi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningStatistics'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ============================================================
+  # ALİ ŞEKER - GEREKSİNİMLER
+  # ============================================================
+
+  # 1. Kursa Katılma (POST)
+  /users/{userId}/courses:
+    post:
+      tags:
+        - lessons
+      summary: Kursa Katılma
+      description: Kullanıcının belirlediği bir İngilizce eğitim seviyesi kursuna kayıt olması.
+      operationId: enrollCourse
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseEnrollment'
+            examples:
+              example1:
+                summary: Kursa katılma örneği
+                value:
+                  courseId: "660e8400-e29b-41d4-a716-446655440001"
+      responses:
+        '201':
+          description: Kursa başarıyla kayıt olundu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCourse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Kullanıcı zaten bu kursa kayıtlı
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # 2. Sınav Sonucu Ekleme (POST)
+  /users/{userId}/exam-results:
+    post:
+      tags:
+        - exams
+      summary: Sınav Sonucu Ekleme
+      description: Çözülen İngilizce deneme sınavı puanlarının ve cevaplarının hesaba kaydedilmesi.
+      operationId: addExamResult
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamResultCreate'
+            examples:
+              example1:
+                summary: Sınav sonucu ekleme
+                value:
+                  examId: "770e8400-e29b-41d4-a716-446655440002"
+                  answers:
+                    - questionId: "q1"
+                      selectedOption: "B"
+                    - questionId: "q2"
+                      selectedOption: "A"
+                  score: 85
+      responses:
+        '201':
+          description: Sınav sonucu başarıyla kaydedildi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # 3. Sınavları Listeleme (GET)
+  /exams:
+    get:
+      tags:
+        - exams
+      summary: Sınavları Listeleme
+      description: Öğrencilerin İngilizce seviyelerini test edebilecekleri uygun sınavların dökümünün yapılması.
+      operationId: listExams
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: level
+          in: query
+          description: Seviyeye göre filtreleme
+          schema:
+            type: string
+            enum: [beginner, elementary, intermediate, upper-intermediate, advanced]
+      responses:
+        '200':
+          description: Sınavlar başarıyla listelendi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # 4. Sınav Puanı Güncelleme (PUT)
+  /users/{userId}/exam-results/{examResultId}:
+    put:
+      tags:
+        - exams
+      summary: Sınav Puanı Güncelleme
+      description: Kullanıcının daha önce çözdüğü bir testi yeniden çözmesi durumunda güncel puanının değiştirilmesi.
+      operationId: updateExamResult
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+        - name: examResultId
+          in: path
+          required: true
+          description: Sınav sonucu ID'si
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamResultUpdate'
+            examples:
+              example1:
+                summary: Sınav puanı güncelleme
+                value:
+                  answers:
+                    - questionId: "q1"
+                      selectedOption: "A"
+                    - questionId: "q2"
+                      selectedOption: "C"
+                  score: 92
+      responses:
+        '200':
+          description: Sınav puanı başarıyla güncellendi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # 5. Kullanıcı Hesabını Silme (DELETE)
+  /users/{userId}:
+    delete:
+      tags:
+        - users
+      summary: Kullanıcı Hesabını Silme
+      description: Kullanıcının üyelik sisteminden tüm kaydının ve ilerleme verilerinin kalıcı olarak silinmesi.
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '204':
+          description: Kullanıcı hesabı ve tüm ilerleme verileri başarıyla silindi
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # 6. Yorum Silme (DELETE)
+  /lessons/{lessonId}/comments/{commentId}:
+    delete:
+      tags:
+        - comments
+      summary: Yorum Silme
+      description: Kullanıcının bir İngilizce dersine veya içeriğine yaptığı değerlendirme yorumunu siteden tamamen kaldırması.
+      operationId: deleteComment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          description: Ders ID'si
+          schema:
+            type: string
+            format: uuid
+        - name: commentId
+          in: path
+          required: true
+          description: Yorum ID'si
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Yorum başarıyla silindi
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # 7. Sertifikaları Görme (GET)
+  /users/{userId}/certificates:
+    get:
+      tags:
+        - statistics
+      summary: Sertifikaları Görme
+      description: Başarıyla bitirilen İngilizce eğitimlerinin dijital başarı belgelerinin kullanıcıya sunulması.
+      operationId: getUserCertificates
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Sertifikalar başarıyla listelendi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificateList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # 8. Yapay Zeka ile İngilizce Pratiği Yapma (POST) - +5 Puanlık Yapay Zeka Gereksinimi
+  /ai/practice:
+    post:
+      tags:
+        - ai
+      summary: Yapay Zeka ile İngilizce Pratiği Yapma
+      description: |
+        Kullanıcının yazdığı İngilizce cümlelerin yapay zeka tarafından incelenip
+        hatalarının düzeltilmesi ve geri bildirim verilmesi.
+        
+        **+5 Puanlık Yapay Zeka Gereksinimi**
+      operationId: aiEnglishPractice
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIPracticeRequest'
+            examples:
+              example1:
+                summary: İngilizce pratik örneği
+                value:
+                  userId: "123e4567-e89b-12d3-a456-426614174000"
+                  text: "I go to school yesterday and I see my friend there."
+                  practiceType: "grammar"
+      responses:
+        '200':
+          description: Yapay zeka geri bildirimi başarıyla oluşturuldu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIPracticeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          description: Çok fazla istek gönderildi (rate limiting)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token ile kimlik doğrulama
+
+  parameters:
+    UserIdParam:
+      name: userId
+      in: path
+      required: true
+      description: Kullanıcı ID'si
+      schema:
+        type: string
+        format: uuid
+
+    WordIdParam:
+      name: wordId
+      in: path
+      required: true
+      description: Kelime ID'si
+      schema:
+        type: string
+        format: uuid
+
+    PageParam:
+      name: page
+      in: query
+      description: Sayfa numarası
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      description: Sayfa başına kayıt sayısı
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  schemas:
+    # ==================== KULLANICI ŞEMALARI ====================
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - firstName
+        - lastName
+        - englishLevel
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Kullanıcı benzersiz kimliği
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        email:
+          type: string
+          format: email
+          description: Kullanıcı email adresi
+          example: "ogrenci@example.com"
+        firstName:
+          type: string
+          description: Ad
+          example: "Enes"
+        lastName:
+          type: string
+          description: Soyad
+          example: "Yavuz"
+        englishLevel:
+          type: string
+          enum: [beginner, elementary, intermediate, upper-intermediate, advanced]
+          description: İngilizce seviyesi
+          example: "intermediate"
+        dailyGoalMinutes:
+          type: integer
+          description: Günlük çalışma hedefi (dakika)
+          example: 30
+        createdAt:
+          type: string
+          format: date-time
+          description: Oluşturulma tarihi
+          example: "2026-01-15T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Güncellenme tarihi
+          example: "2026-01-20T14:45:00Z"
+
+    StudentRegistration:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+        - englishLevel
+      properties:
+        email:
+          type: string
+          format: email
+          example: "ogrenci@example.com"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: "Guvenli123!"
+        firstName:
+          type: string
+          minLength: 2
+          example: "Enes"
+        lastName:
+          type: string
+          minLength: 2
+          example: "Yavuz"
+        englishLevel:
+          type: string
+          enum: [beginner, elementary, intermediate, upper-intermediate, advanced]
+          description: Başlangıç İngilizce seviyesi
+          example: "beginner"
+
+    ProfileUpdate:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minLength: 2
+          example: "Enes Celal"
+        lastName:
+          type: string
+          minLength: 2
+          example: "Yavuz"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: "YeniSifre456!"
+
+    # ==================== KELİME ŞEMALARI ====================
+    Word:
+      type: object
+      required:
+        - id
+        - english
+        - turkish
+        - level
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        english:
+          type: string
+          description: İngilizce kelime
+          example: "achievement"
+        turkish:
+          type: string
+          description: Türkçe anlamı
+          example: "başarı"
+        level:
+          type: string
+          enum: [beginner, elementary, intermediate, upper-intermediate, advanced]
+          description: Kelime seviyesi
+          example: "intermediate"
+        exampleSentence:
+          type: string
+          description: Örnek cümle
+          example: "This is a great achievement for our team."
+
+    WordList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Word'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    FavoriteWord:
+      type: object
+      required:
+        - id
+        - userId
+        - word
+        - addedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "880e8400-e29b-41d4-a716-446655440003"
+        userId:
+          type: string
+          format: uuid
+        word:
+          $ref: '#/components/schemas/Word'
+        addedAt:
+          type: string
+          format: date-time
+          example: "2026-02-10T09:15:00Z"
+
+    FavoriteWordCreate:
+      type: object
+      required:
+        - wordId
+      properties:
+        wordId:
+          type: string
+          format: uuid
+          description: Favorilere eklenecek kelimenin ID'si
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+    # ==================== DERS VE KURS ŞEMALARI ====================
+    Lesson:
+      type: object
+      required:
+        - id
+        - title
+        - level
+        - description
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "990e8400-e29b-41d4-a716-446655440004"
+        title:
+          type: string
+          description: Ders başlığı
+          example: "Present Tense (Geniş Zaman)"
+        level:
+          type: string
+          enum: [beginner, elementary, intermediate, upper-intermediate, advanced]
+          description: Ders seviyesi
+          example: "beginner"
+        description:
+          type: string
+          description: Ders açıklaması
+          example: "Bu derste İngilizce geniş zaman kalıplarını öğreneceksiniz."
+        durationMinutes:
+          type: integer
+          description: Tahmini ders süresi (dakika)
+          example: 45
+        order:
+          type: integer
+          description: Dersin sırası
+          example: 1
+
+    LessonList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lesson'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    CourseEnrollment:
+      type: object
+      required:
+        - courseId
+      properties:
+        courseId:
+          type: string
+          format: uuid
+          description: Katılınacak kursun ID'si
+          example: "660e8400-e29b-41d4-a716-446655440001"
+
+    UserCourse:
+      type: object
+      required:
+        - id
+        - userId
+        - courseId
+        - courseName
+        - enrolledAt
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "aa0e8400-e29b-41d4-a716-446655440005"
+        userId:
+          type: string
+          format: uuid
+        courseId:
+          type: string
+          format: uuid
+        courseName:
+          type: string
+          example: "Beginner English Course"
+        level:
+          type: string
+          enum: [beginner, elementary, intermediate, upper-intermediate, advanced]
+          example: "beginner"
+        enrolledAt:
+          type: string
+          format: date-time
+          example: "2026-02-15T08:00:00Z"
+        status:
+          type: string
+          enum: [active, completed, dropped]
+          example: "active"
+        progressPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 25
+
+    # ==================== ÇALIŞMA HEDEFİ ====================
+    StudyGoalUpdate:
+      type: object
+      required:
+        - dailyGoalMinutes
+      properties:
+        dailyGoalMinutes:
+          type: integer
+          minimum: 5
+          maximum: 480
+          description: Günlük hedef çalışma süresi (dakika)
+          example: 30
+
+    StudyGoal:
+      type: object
+      required:
+        - userId
+        - dailyGoalMinutes
+        - updatedAt
+      properties:
+        userId:
+          type: string
+          format: uuid
+        dailyGoalMinutes:
+          type: integer
+          example: 30
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2026-03-01T12:00:00Z"
+
+    # ==================== İSTATİSTİK ŞEMALARI ====================
+    LearningStatistics:
+      type: object
+      required:
+        - userId
+        - totalWordsLearned
+        - totalLessonsCompleted
+        - totalStudyTimeMinutes
+      properties:
+        userId:
+          type: string
+          format: uuid
+        totalWordsLearned:
+          type: integer
+          description: Toplam ezberlenen kelime sayısı
+          example: 150
+        totalLessonsCompleted:
+          type: integer
+          description: Toplam tamamlanan ders sayısı
+          example: 12
+        totalStudyTimeMinutes:
+          type: integer
+          description: Toplam çalışma süresi (dakika)
+          example: 720
+        currentStreak:
+          type: integer
+          description: Ardışık çalışma günü sayısı
+          example: 7
+        averageExamScore:
+          type: number
+          format: float
+          description: Ortalama sınav puanı
+          example: 78.5
+        completedCourses:
+          type: integer
+          description: Tamamlanan kurs sayısı
+          example: 2
+
+    # ==================== SINAV ŞEMALARI ====================
+    Exam:
+      type: object
+      required:
+        - id
+        - title
+        - level
+        - questionCount
+        - durationMinutes
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "770e8400-e29b-41d4-a716-446655440002"
+        title:
+          type: string
+          description: Sınav başlığı
+          example: "Beginner Level Grammar Test"
+        level:
+          type: string
+          enum: [beginner, elementary, intermediate, upper-intermediate, advanced]
+          example: "beginner"
+        description:
+          type: string
+          example: "Başlangıç seviyesi dilbilgisi testi"
+        questionCount:
+          type: integer
+          description: Soru sayısı
+          example: 20
+        durationMinutes:
+          type: integer
+          description: Sınav süresi (dakika)
+          example: 30
+
+    ExamList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Exam'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    ExamResultCreate:
+      type: object
+      required:
+        - examId
+        - answers
+        - score
+      properties:
+        examId:
+          type: string
+          format: uuid
+          description: Sınav ID'si
+        answers:
+          type: array
+          description: Verilen cevaplar
+          items:
+            $ref: '#/components/schemas/ExamAnswer'
+        score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: Alınan puan
+          example: 85
+
+    ExamResultUpdate:
+      type: object
+      required:
+        - answers
+        - score
+      properties:
+        answers:
+          type: array
+          description: Güncel cevaplar
+          items:
+            $ref: '#/components/schemas/ExamAnswer'
+        score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: Güncel puan
+          example: 92
+
+    ExamResult:
+      type: object
+      required:
+        - id
+        - userId
+        - examId
+        - score
+        - completedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "bb0e8400-e29b-41d4-a716-446655440006"
+        userId:
+          type: string
+          format: uuid
+        examId:
+          type: string
+          format: uuid
+        examTitle:
+          type: string
+          example: "Beginner Level Grammar Test"
+        score:
+          type: number
+          format: float
+          example: 85
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExamAnswer'
+        completedAt:
+          type: string
+          format: date-time
+          example: "2026-03-05T14:30:00Z"
+        attemptNumber:
+          type: integer
+          description: Deneme numarası
+          example: 2
+
+    ExamAnswer:
+      type: object
+      required:
+        - questionId
+        - selectedOption
+      properties:
+        questionId:
+          type: string
+          description: Soru ID'si
+          example: "q1"
+        selectedOption:
+          type: string
+          description: Seçilen cevap
+          example: "B"
+
+    # ==================== SERTİFİKA ŞEMALARI ====================
+    Certificate:
+      type: object
+      required:
+        - id
+        - userId
+        - courseName
+        - issuedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "cc0e8400-e29b-41d4-a716-446655440007"
+        userId:
+          type: string
+          format: uuid
+        courseName:
+          type: string
+          description: Tamamlanan kurs adı
+          example: "Beginner English Course"
+        courseLevel:
+          type: string
+          enum: [beginner, elementary, intermediate, upper-intermediate, advanced]
+          example: "beginner"
+        finalScore:
+          type: number
+          format: float
+          description: Final puanı
+          example: 88.5
+        issuedAt:
+          type: string
+          format: date-time
+          description: Sertifika veriliş tarihi
+          example: "2026-02-28T16:00:00Z"
+        certificateUrl:
+          type: string
+          format: uri
+          description: Sertifika indirme linki
+          example: "https://api.lingolearn.com/certificates/cc0e8400.pdf"
+
+    CertificateList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Certificate'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ==================== YAPAY ZEKA ŞEMALARI ====================
+    AIPracticeRequest:
+      type: object
+      required:
+        - userId
+        - text
+        - practiceType
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: Kullanıcı ID'si
+        text:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: Kullanıcının yazdığı İngilizce metin
+          example: "I go to school yesterday and I see my friend there."
+        practiceType:
+          type: string
+          enum: [grammar, vocabulary, writing, conversation]
+          description: Pratik türü
+          example: "grammar"
+
+    AIPracticeResponse:
+      type: object
+      required:
+        - id
+        - originalText
+        - correctedText
+        - feedback
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "dd0e8400-e29b-41d4-a716-446655440008"
+        originalText:
+          type: string
+          description: Kullanıcının gönderdiği orijinal metin
+          example: "I go to school yesterday and I see my friend there."
+        correctedText:
+          type: string
+          description: Düzeltilmiş metin
+          example: "I went to school yesterday and I saw my friend there."
+        feedback:
+          type: array
+          description: Detaylı geri bildirimler
+          items:
+            $ref: '#/components/schemas/AIFeedbackItem'
+        overallScore:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: Genel performans puanı
+          example: 60
+        tips:
+          type: array
+          description: Öğrenciye öneriler
+          items:
+            type: string
+          example:
+            - "Past Simple (Geçmiş Zaman) kurallarını tekrar edin."
+            - "Düzensiz fiillerin (irregular verbs) listesini çalışın."
+
+    AIFeedbackItem:
+      type: object
+      properties:
+        errorType:
+          type: string
+          enum: [grammar, spelling, vocabulary, punctuation, word_order]
+          description: Hata türü
+          example: "grammar"
+        original:
+          type: string
+          description: Hatalı kısım
+          example: "I go"
+        correction:
+          type: string
+          description: Doğru kullanım
+          example: "I went"
+        explanation:
+          type: string
+          description: Açıklama
+          example: "'Yesterday' geçmişe işaret eder, bu nedenle 'go' fiili 'went' olarak kullanılmalıdır (Past Simple)."
+
+    # ==================== ORTAK ŞEMALAR ====================
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: Mevcut sayfa
+          example: 1
+        limit:
+          type: integer
+          description: Sayfa başına kayıt
+          example: 20
+        totalPages:
+          type: integer
+          description: Toplam sayfa sayısı
+          example: 5
+        totalItems:
+          type: integer
+          description: Toplam kayıt sayısı
+          example: 95
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Hata kodu
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          description: Hata mesajı
+          example: "Geçersiz email adresi"
+        details:
+          type: array
+          description: Detaylı hata bilgileri
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "email"
+              message:
+                type: string
+                example: "Email formatı geçersiz"
+
+  responses:
+    BadRequest:
+      description: Geçersiz istek
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "İstek parametreleri geçersiz"
+
+    Unauthorized:
+      description: Yetkisiz erişim
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "UNAUTHORIZED"
+            message: "Kimlik doğrulama başarısız"
+
+    NotFound:
+      description: Kaynak bulunamadı
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "İstenen kaynak bulunamadı"
+
+    Forbidden:
+      description: Erişim reddedildi
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "FORBIDDEN"
+            message: "Bu işlem için yetkiniz bulunmamaktadır"
