@@ -11,6 +11,13 @@ Bu proje, Yazılım Mühendisliği dersi kapsamında geliştirilmiş bir İngili
 ## Genel Konsept
 LingoLearn, kullanıcıların seviyelerine uygun İngilizce dersleri alabildiği, kelime listeleri oluşturabildiği, sınavlarla kendilerini test edebildiği ve yapay zeka destekli İngilizce pratiği yapabildiği modern bir web platformudur.
 
+## Dokümantasyon
+
+Proje dokümantasyonuna aşağıdaki linklerden erişebilirsiniz:
+
+1. [Gereksinim Analizi](#gereksinim-analizi)
+2. [REST API Tasarımı](API-Tasarimi.md)
+
 ## Gereksinim Analizi
 
 Projemizdeki fonksiyonel gereksinimler, proje ekibi tarafından paylaşılmıştır. Sistem genelinde toplam **16 adet** temel fonksiyonel gereksinim belirlenmiştir:
