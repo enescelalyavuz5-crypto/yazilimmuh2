@@ -14,3 +14,5 @@ Bu dosyada, LingoLearn (İngilizce Öğrenme Platformu) projesinde şahsım tara
   - **Açıklama:** Kullanıcının üyelik sisteminden tüm kaydının ve ilerleme verilerinin kalıcı olarak silinmesi.
 - **Yorum Silme** (DELETE API Metodu)
   - **Açıklama:** Kullanıcının bir İngilizce dersine veya içeriğine yaptığı değerlendirme yorumunu siteden tamamen kaldırması.
+- **Sertifikaları Görme** (GET API Metodu)
+  - **Açıklama:** Başarıyla bitirilen İngilizce eğitimlerinin dijital başarı belgelerinin kullanıcıya sunulması.
