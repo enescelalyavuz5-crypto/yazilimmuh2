@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: LingoLearn API
+  title: FluentBee API
   description: |
-    LingoLearn İngilizce Öğrenme Platformu için RESTful API.
+    FluentBee İngilizce Öğrenme Platformu için RESTful API.
     
     ## Özellikler
     - Kullanıcı yönetimi (kayıt, profil güncelleme, hesap silme)
@@ -14,12 +14,12 @@ info:
     - JWT tabanlı kimlik doğrulama
   version: 1.0.0
   contact:
-    name: LingoLearn Destek Ekibi
-    email: destek@lingolearn.com
-    url: https://lingolearn.com/destek
+    name: FluentBee Destek Ekibi
+    email: destek@fluentbee.com
+    url: https://fluentbee.com/destek
 
 servers:
-  - url: https://api.lingolearn.com/v1
+  - url: https://api.fluentbee.com/v1
     description: Production server
   - url: http://localhost:5000/v1
     description: Development server
