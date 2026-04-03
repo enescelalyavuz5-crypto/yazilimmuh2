@@ -35,7 +35,10 @@ export default function RootLayout({
                   </div>
                 </div>
               </div>
-              <div>
+              <div className="flex items-center gap-4">
+                <Link href="/login" className="text-neutral-300 hover:text-white font-bold transition-colors">
+                  Sign In
+                </Link>
                 <Link href="/register" className="bg-amber-500 hover:bg-amber-600 text-black px-4 py-2 rounded-md text-sm font-bold transition-all shadow-[0_0_15px_rgba(245,158,11,0.5)]">
                   Sign Up
                 </Link>
@@ -43,9 +46,34 @@ export default function RootLayout({
             </div>
           </div>
         </nav>
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
           {children}
         </main>
+        <footer className="border-t border-white/10 bg-black/80 py-12 mt-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">FluentBee</h3>
+                <p className="text-neutral-400 text-sm">Yazılım Mühendisliği dersi kapsamında geliştirilen İngilizce öğrenme platformu prototipi. Yapay zeka, kurslar ve sözlük modülleri içerir.</p>
+              </div>
+              <div className="md:justify-self-end">
+                <h4 className="font-bold mb-4 text-white">Proje Modülleri</h4>
+                <ul className="space-y-2 text-sm text-neutral-400">
+                  <li><Link href="/lessons" className="hover:text-amber-400 transition-colors">Dersler</Link></li>
+                  <li><Link href="/words" className="hover:text-amber-400 transition-colors">Sözlük</Link></li>
+                  <li><Link href="/ai" className="hover:text-amber-400 transition-colors">AI Pratik Eğitmeni</Link></li>
+                  <li><Link href="/exams" className="hover:text-amber-400 transition-colors">Sınavlar</Link></li>
+                </ul>
+              </div>
+            </div>
+            <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-neutral-500">
+              <div>© {new Date().getFullYear()} FluentBee. Tüm hakları saklıdır.</div>
+              <div className="mt-4 md:mt-0">
+                Geliştiriciler: <strong>Enes Celal Yavuz</strong> & <strong>Ali Şeker</strong>
+              </div>
+            </div>
+          </div>
+        </footer>
       </body>
     </html>
   );
