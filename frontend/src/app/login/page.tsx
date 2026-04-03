@@ -12,10 +12,22 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Normalde backend'in /v1/auth/login adresine istek atılır.
-    // Şimdilik mock başarılı giriş:
-    alert("Giriş Başarılı!");
-    router.push("/profile");
+    try {
+      const res = await fetch("http://localhost:5000/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+      if (res.ok) {
+        alert("Giriş Başarılı!");
+        router.push("/profile");
+      } else {
+        alert("E-posta veya şifre hatalı.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Sunucuya bağlanılamadı.");
+    }
   };
 
   return (

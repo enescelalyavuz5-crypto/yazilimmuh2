@@ -5,6 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FluentBee.Api.Controllers
 {
+    public class LoginDto
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
     [ApiController]
     [Route("v1/auth")]
     public class AuthController : ControllerBase
@@ -41,6 +47,22 @@ namespace FluentBee.Api.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(Register), new { id = user.Id }, user);
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null || user.PasswordHash != dto.Password)
+            {
+                return Unauthorized(new { message = "E-posta veya şifre hatalı." });
+            }
+
+            // In a real app, generate and return a JWT here. For now, return the user object (simulating session)
+            return Ok(new { 
+                token = "mock-jwt-token-" + user.Id,
+                user = user 
+            });
         }
     }
 }
