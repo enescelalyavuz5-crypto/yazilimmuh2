@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Register() {
   const router = useRouter();
@@ -21,64 +22,83 @@ export default function Register() {
         body: JSON.stringify(formData)
       });
       if (res.ok) {
-        alert("Registration successful!");
-        router.push("/profile"); // mock redirect for now
+        alert("Kayıt Başarılı! Öğrenme yolculuğuna hoş geldin.");
+        router.push("/profile");
       } else {
-        alert("Registration failed");
+        alert("Kayıt işlemi başarısız oldu. Girdiğin bilgileri kontrol et.");
       }
     } catch (error) {
       console.error(error);
-      alert("Registration failed");
+      alert("Sunucuya bağlanılamadı.");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12 bg-white/5 p-8 rounded-2xl border border-white/10 backdrop-blur-md">
-      <h2 className="text-3xl font-bold mb-6 text-center">Create Account</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-neutral-400 mb-1">First Name</label>
-            <input type="text" required
-              className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none"
-              onChange={(e) => setFormData({...formData, firstName: e.target.value})} />
+    <div className="max-w-xl mx-auto mt-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+      <div className="bg-[#0A0A0A] p-8 md:p-10 rounded-[2rem] border border-white/10 shadow-2xl relative overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-emerald-500/20 blur-[80px] rounded-full pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-48 h-48 bg-cyan-500/10 blur-[60px] rounded-full pointer-events-none"></div>
+
+        <div className="relative z-10">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-black mb-3 text-white tracking-tight">Ücretsiz Hesap Oluştur</h2>
+            <p className="text-neutral-400 text-sm md:text-base">Hemen aramıza katıl ve AI desteki İngilizce platformunun avantajlarından faydalan.</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-neutral-400 mb-1">Last Name</label>
-            <input type="text" required
-              className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none"
-              onChange={(e) => setFormData({...formData, lastName: e.target.value})} />
-          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-1.5">
+                <label className="block text-sm font-semibold text-neutral-300">Ad</label>
+                <input type="text" required placeholder="Adın"
+                  className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all placeholder:text-neutral-600"
+                  onChange={(e) => setFormData({...formData, firstName: e.target.value})} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-semibold text-neutral-300">Soyad</label>
+                <input type="text" required placeholder="Soyadın"
+                  className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all placeholder:text-neutral-600"
+                  onChange={(e) => setFormData({...formData, lastName: e.target.value})} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-sm font-semibold text-neutral-300">E-Posta Adresi</label>
+              <input type="email" required placeholder="ornek@posta.com"
+                className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all placeholder:text-neutral-600"
+                onChange={(e) => setFormData({...formData, email: e.target.value})} />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-sm font-semibold text-neutral-300">Şifre</label>
+              <input type="password" required placeholder="En az 8 karakter"
+                className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all placeholder:text-neutral-600"
+                onChange={(e) => setFormData({...formData, password: e.target.value})} />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-sm font-semibold text-neutral-300">İngilizce Seviyen</label>
+              <select 
+                className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all appearance-none"
+                onChange={(e) => setFormData({...formData, englishLevel: e.target.value})}>
+                <option value="beginner">Başlangıç (Beginner A1-A2)</option>
+                <option value="intermediate">Orta (Intermediate B1-B2)</option>
+                <option value="advanced">İleri (Advanced C1)</option>
+              </select>
+            </div>
+
+            <button type="submit" 
+              className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl px-4 py-4 mt-8 transition-all shadow-[0_5px_20px_-5px_rgba(16,185,129,0.5)] flex justify-center items-center gap-2 group">
+              FluentBee'ye Katıl
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-neutral-500 mt-8 font-medium">
+              Zaten hesabın var mı? <Link href="/login" className="text-white hover:text-emerald-400 transition-colors">Giriş Yap</Link>
+          </p>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-400 mb-1">Email</label>
-          <input type="email" required
-            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none"
-            onChange={(e) => setFormData({...formData, email: e.target.value})} />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-400 mb-1">Password</label>
-          <input type="password" required
-            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none"
-            onChange={(e) => setFormData({...formData, password: e.target.value})} />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-neutral-400 mb-1">Current English Level</label>
-          <select 
-            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none"
-            onChange={(e) => setFormData({...formData, englishLevel: e.target.value})}>
-            <option value="beginner">Beginner</option>
-            <option value="elementary">Elementary</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="upper-intermediate">Upper Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-        </div>
-        <button type="submit" 
-          className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-lg px-4 py-3 mt-6 transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-          Join FluentBee
-        </button>
-      </form>
+      </div>
     </div>
   );
 }
