@@ -28,7 +28,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    // Run Seeder
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var context = services.GetRequiredService<FluentBee.Api.Data.ApplicationDbContext>();
+        FluentBee.Api.Data.DbSeeder.Seed(context);
+    }
 }
 
 app.UseHttpsRedirection();
