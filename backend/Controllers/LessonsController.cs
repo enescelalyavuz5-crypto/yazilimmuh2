@@ -42,5 +42,23 @@ namespace FluentBee.Api.Controllers
                 totalPages
             });
         }
+
+        // ============================================
+        // ALI SEKER GOREVLERI (YORUM SILME)
+        // ============================================
+        [HttpDelete("{lessonId}/comments/{commentId}")]
+        public async Task<IActionResult> DeleteComment(Guid lessonId, Guid commentId)
+        {
+            var comment = await _context.Comments.FindAsync(commentId);
+            if (comment == null || comment.LessonId != lessonId)
+            {
+                return NotFound();
+            }
+
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }

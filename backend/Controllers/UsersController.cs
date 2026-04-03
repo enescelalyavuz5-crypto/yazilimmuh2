@@ -94,16 +94,87 @@ namespace FluentBee.Api.Controllers
             if (user == null) return NotFound();
 
             var memorizedWords = await _context.FavoriteWords.CountAsync(fw => fw.UserId == userId);
-            
-            // For now mock completed lessons since Ali implements Course/Exam, not Lesson completions directly, 
-            // though we can just return a dummy 0 for now.
-            var completedLessons = 0; 
+            var completedLessons = await _context.ExamResults.CountAsync(er => er.UserId == userId); // using exam results count to simulate completed lessons
 
             return Ok(new LearningStatisticsDto
             {
                 MemorizedWordsCount = memorizedWords,
                 CompletedLessonsCount = completedLessons
             });
+        }
+
+        // ============================================
+        // ALI SEKER GOREVLERI (USER EXTENSIONS)
+        // ============================================
+
+        public class CourseEnrollmentDto { public Guid CourseId { get; set; } }
+
+        [HttpPost("{userId}/courses")]
+        public async Task<IActionResult> EnrollCourse(Guid userId, [FromBody] CourseEnrollmentDto dto)
+        {
+            if (await _context.UserCourses.AnyAsync(uc => uc.UserId == userId && uc.CourseId == dto.CourseId))
+                return Conflict(new { message = "Kullanıcı zaten bu kursa kayıtlı" });
+
+            var enrollment = new UserCourse
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                CourseId = dto.CourseId,
+                EnrolledAt = DateTime.UtcNow
+            };
+            _context.UserCourses.Add(enrollment);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(EnrollCourse), new { id = enrollment.Id }, enrollment);
+        }
+
+        public class ExamResultCreateDto { public Guid ExamId { get; set; } public int Score { get; set; } public string Answers { get; set; } = "[]"; }
+
+        [HttpPost("{userId}/exam-results")]
+        public async Task<IActionResult> AddExamResult(Guid userId, [FromBody] ExamResultCreateDto dto)
+        {
+            var result = new ExamResult
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                ExamId = dto.ExamId,
+                Score = dto.Score,
+                AnswersJson = dto.Answers,
+                CompletedAt = DateTime.UtcNow
+            };
+            _context.ExamResults.Add(result);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(AddExamResult), new { id = result.Id }, result);
+        }
+
+        public class ExamResultUpdateDto { public int Score { get; set; } public string Answers { get; set; } = "[]"; }
+
+        [HttpPut("{userId}/exam-results/{examResultId}")]
+        public async Task<IActionResult> UpdateExamResult(Guid userId, Guid examResultId, [FromBody] ExamResultUpdateDto dto)
+        {
+            var result = await _context.ExamResults.FindAsync(examResultId);
+            if (result == null || result.UserId != userId) return NotFound();
+
+            result.Score = dto.Score;
+            result.AnswersJson = dto.Answers;
+            await _context.SaveChangesAsync();
+            return Ok(result);
+        }
+
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> DeleteUser(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound();
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpGet("{userId}/certificates")]
+        public async Task<IActionResult> GetCertificates(Guid userId)
+        {
+            var certs = await _context.Certificates.Where(c => c.UserId == userId).ToListAsync();
+            return Ok(new { data = certs });
         }
     }
 }

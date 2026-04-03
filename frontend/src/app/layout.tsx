@@ -16,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.className} min-h-screen bg-neutral-950 text-neutral-50`}>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen bg-neutral-950 text-neutral-50`} suppressHydrationWarning>
         <nav className="border-b border-white/10 bg-black/50 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -29,6 +29,8 @@ export default function RootLayout({
                   <div className="flex items-baseline space-x-4">
                     <Link href="/lessons" className="hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Lessons</Link>
                     <Link href="/words" className="hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dictionary</Link>
+                    <Link href="/exams" className="hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Exams</Link>
+                    <Link href="/ai" className="hover:bg-cyan-500/20 text-cyan-400 px-3 py-2 rounded-md text-sm font-bold transition-colors">AI Tutor ✨</Link>
                     <Link href="/profile" className="hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Profile</Link>
                   </div>
                 </div>
