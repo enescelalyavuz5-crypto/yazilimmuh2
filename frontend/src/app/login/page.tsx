@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "react-hot-toast";
 
 export default function Login() {
   const router = useRouter();
@@ -19,14 +20,19 @@ export default function Login() {
         body: JSON.stringify(formData)
       });
       if (res.ok) {
-        alert("Giriş Başarılı!");
+        const data = await res.json();
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userId", data.user.id);
+        localStorage.setItem("userName", `${data.user.firstName} ${data.user.lastName}`);
+        window.dispatchEvent(new Event("auth-change"));
+        toast.success("Tekrar hoş geldin!", { icon: '👋' });
         router.push("/profile");
       } else {
-        alert("E-posta veya şifre hatalı.");
+        toast.error("E-posta veya şifre hatalı.");
       }
     } catch (error) {
       console.error(error);
-      alert("Sunucuya bağlanılamadı.");
+      toast.error("Sunucuya bağlanılamadı.");
     }
   };
 

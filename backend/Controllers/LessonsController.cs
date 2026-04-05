@@ -46,6 +46,48 @@ namespace FluentBee.Api.Controllers
         // ============================================
         // ALI SEKER GOREVLERI (YORUM SILME)
         // ============================================
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetLesson(Guid id)
+        {
+            var lesson = await _context.Lessons.FindAsync(id);
+            if (lesson == null) return NotFound(new { message = "Ders bulunamadı." });
+            return Ok(lesson);
+        }
+
+        // POST /v1/lessons/{id}/complete?userId=...
+        [HttpPost("{id}/complete")]
+        public async Task<IActionResult> CompleteLesson(Guid id, [FromQuery] Guid userId)
+        {
+            if (userId == Guid.Empty) return BadRequest(new { message = "userId gerekli." });
+
+            var lesson = await _context.Lessons.FindAsync(id);
+            if (lesson == null) return NotFound(new { message = "Ders bulunamadı." });
+
+            // Aynı ders zaten tamamlanmış mı?
+            var alreadyDone = await _context.ExamResults
+                .AnyAsync(er => er.UserId == userId && er.ExamId == id);
+
+            if (alreadyDone)
+                return Ok(new { message = "Bu ders zaten tamamlanmış.", alreadyCompleted = true });
+
+            // ExamResults tablosunu lesson completion için de kullanıyoruz
+            var result = new ExamResult
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                ExamId = id, // lessonId kullanıyoruz
+                Score = 100,
+                AnswersJson = "[]",
+                CompletedAt = DateTime.UtcNow
+            };
+            _context.ExamResults.Add(result);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Ders tamamlandı! 🎉", alreadyCompleted = false });
+        }
+
+
         [HttpDelete("{lessonId}/comments/{commentId}")]
         public async Task<IActionResult> DeleteComment(Guid lessonId, Guid commentId)
         {

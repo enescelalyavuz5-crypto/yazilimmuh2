@@ -1,0 +1,217 @@
+{
+  "info": {
+    "name": "FluentBee API",
+    "_postman_id": "fluentbee-api-collection",
+    "description": "FluentBee İngilizce Öğrenme Platformu - Tüm API Endpoint'leri\n\n**Kullanım:**\n1. Bu dosyayı Postman'a import edin\n2. `userId` değişkenini kendi userId'nizle güncelleyin\n3. Önce Register veya Login yaparak userId'nizi öğrenin",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000", "type": "string" },
+    { "key": "userId", "value": "BURAYA_LOGIN_SONRASI_USERID_YAZAR", "type": "string" },
+    { "key": "wordId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Kayıt Ol (Register)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/v1/auth/register", "host": ["{{base_url}}"], "path": ["v1", "auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Enes\",\n  \"lastName\": \"Yavuz\",\n  \"email\": \"enes@test.com\",\n  \"password\": \"123456\",\n  \"englishLevel\": \"B1\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Giriş Yap (Login)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/v1/auth/login", "host": ["{{base_url}}"], "path": ["v1", "auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"enes@test.com\",\n  \"password\": \"123456\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📚 Dersler (Lessons)",
+      "item": [
+        {
+          "name": "Tüm Dersleri Getir",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/lessons?page=1&limit=10", "host": ["{{base_url}}"], "path": ["v1", "lessons"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Dersleri Seviyeye Göre Filtrele",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/lessons?level=A1", "host": ["{{base_url}}"], "path": ["v1", "lessons"], "query": [{ "key": "level", "value": "A1" }] }
+          }
+        },
+        {
+          "name": "Dersten Yorum Sil",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/v1/lessons/LESSON_ID/comments/COMMENT_ID", "host": ["{{base_url}}"], "path": ["v1", "lessons", "LESSON_ID", "comments", "COMMENT_ID"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📖 Kelimeler (Words)",
+      "item": [
+        {
+          "name": "Tüm Kelimeleri Getir",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/words?page=1&limit=20", "host": ["{{base_url}}"], "path": ["v1", "words"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "20" }] }
+          }
+        },
+        {
+          "name": "Kelime Ara",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/words?search=book", "host": ["{{base_url}}"], "path": ["v1", "words"], "query": [{ "key": "search", "value": "book" }] }
+          }
+        },
+        {
+          "name": "Seviyeye Göre Kelime Getir",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/words?level=A1", "host": ["{{base_url}}"], "path": ["v1", "words"], "query": [{ "key": "level", "value": "A1" }] }
+          }
+        },
+        {
+          "name": "Favorilere Ekle ⭐",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{base_url}}/v1/words/{{wordId}}/favorite?userId={{userId}}", "host": ["{{base_url}}"], "path": ["v1", "words", "{{wordId}}", "favorite"], "query": [{ "key": "userId", "value": "{{userId}}" }] }
+          }
+        },
+        {
+          "name": "Favorilerden Çıkar",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/v1/words/{{wordId}}/favorite?userId={{userId}}", "host": ["{{base_url}}"], "path": ["v1", "words", "{{wordId}}", "favorite"], "query": [{ "key": "userId", "value": "{{userId}}" }] }
+          }
+        },
+        {
+          "name": "Favori Kelimelerimi Getir",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/words/favorites?userId={{userId}}", "host": ["{{base_url}}"], "path": ["v1", "words", "favorites"], "query": [{ "key": "userId", "value": "{{userId}}" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📝 Sınavlar (Exams)",
+      "item": [
+        {
+          "name": "Tüm Sınavları Getir",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/exams?page=1&limit=10", "host": ["{{base_url}}"], "path": ["v1", "exams"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Sınavları Seviyeye Göre Filtrele",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/exams?level=B1", "host": ["{{base_url}}"], "path": ["v1", "exams"], "query": [{ "key": "level", "value": "B1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Kullanıcı (Users)",
+      "item": [
+        {
+          "name": "İstatistikleri Getir",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/users/{{userId}}/statistics", "host": ["{{base_url}}"], "path": ["v1", "users", "{{userId}}", "statistics"] }
+          }
+        },
+        {
+          "name": "Günlük Hedef Güncelle",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/v1/users/{{userId}}/study-goal", "host": ["{{base_url}}"], "path": ["v1", "users", "{{userId}}", "study-goal"] },
+            "body": { "mode": "raw", "raw": "{\n  \"dailyGoalMinutes\": 45\n}" }
+          }
+        },
+        {
+          "name": "Profil Güncelle",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/v1/users/{{userId}}/profile", "host": ["{{base_url}}"], "path": ["v1", "users", "{{userId}}", "profile"] },
+            "body": { "mode": "raw", "raw": "{\n  \"firstName\": \"Enes\",\n  \"lastName\": \"Yavuz\"\n}" }
+          }
+        },
+        {
+          "name": "Kursa Kayıt Ol",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/v1/users/{{userId}}/courses", "host": ["{{base_url}}"], "path": ["v1", "users", "{{userId}}", "courses"] },
+            "body": { "mode": "raw", "raw": "{\n  \"courseId\": \"BURAYA_COURSE_ID\"\n}" }
+          }
+        },
+        {
+          "name": "Sınav Sonucu Ekle",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/v1/users/{{userId}}/exam-results", "host": ["{{base_url}}"], "path": ["v1", "users", "{{userId}}", "exam-results"] },
+            "body": { "mode": "raw", "raw": "{\n  \"examId\": \"BURAYA_EXAM_ID\",\n  \"score\": 85,\n  \"answers\": \"[]\"\n}" }
+          }
+        },
+        {
+          "name": "Sertifikaları Getir",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/users/{{userId}}/certificates", "host": ["{{base_url}}"], "path": ["v1", "users", "{{userId}}", "certificates"] }
+          }
+        },
+        {
+          "name": "Hesabı Sil ⚠️",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/v1/users/{{userId}}", "host": ["{{base_url}}"], "path": ["v1", "users", "{{userId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤖 AI Tutor",
+      "item": [
+        {
+          "name": "Metin Analizi (Grammar Check)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/v1/ai/practice", "host": ["{{base_url}}"], "path": ["v1", "ai", "practice"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"text\": \"I goes to school yesterday and learned many things.\",\n  \"practiceType\": \"grammar\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

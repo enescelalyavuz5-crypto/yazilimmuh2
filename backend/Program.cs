@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using FluentBee.Api.Data;
+using FluentBee.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,9 +9,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // Add Database Context
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=fluentbee.db";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Server=(local);Database=FluentBeeDb;Trusted_Connection=True;TrustServerCertificate=True;";
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+    options.UseSqlServer(connectionString));
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -22,6 +23,8 @@ builder.Services.AddCors(options =>
                .AllowAnyHeader();
     });
 });
+
+builder.Services.AddHttpClient<GeminiAiService>();
 
 var app = builder.Build();
 
