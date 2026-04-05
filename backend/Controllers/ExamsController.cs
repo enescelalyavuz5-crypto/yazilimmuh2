@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FluentBee.Api.Controllers
 {
+    // Author: Ali Şeker
+    // Requirement: Sınavları Listeleme ve Sınav Sonucu Ekleme
     [ApiController]
     [Route("v1/exams")]
     public class ExamsController : ControllerBase
