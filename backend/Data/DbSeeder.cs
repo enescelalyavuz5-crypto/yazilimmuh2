@@ -23,11 +23,24 @@ namespace FluentBee.Api.Data
             }
 
             // Eğer hiç ders yoksa veya içeriksiz dersler varsa yeniden seed et
-            if (!context.Lessons.Any() || context.Lessons.Any(l => l.Content == null || l.Content == string.Empty))
+            if (!context.Lessons.Any() || context.Lessons.Any(l => string.IsNullOrEmpty(l.Content)))
             {
-                context.Lessons.RemoveRange(context.Lessons.ToList());
-                context.SaveChanges();
-                context.Lessons.AddRange(
+                // Mevcut dersleri silmek yerine, sadece yeni içerikli versiyonlarını listeye ekle
+                // Eğer ID'ler çakışacaksa silme yerine 'Update' mantığı daha iyidir
+                // Ama şimdilik sadece eksik olanları ekleyelim ya da tabloyu temizleyelim (bağımlılık yoksa)
+                
+                try {
+                    // Bağımlı verileri (ExamResults) kontrol et
+                    var hasResults = context.ExamResults.Any();
+                    if (!hasResults) {
+                        context.Lessons.RemoveRange(context.Lessons);
+                        context.SaveChanges();
+                    }
+                } catch { /* Ignore */ }
+
+                if (!context.Lessons.Any())
+                {
+                    context.Lessons.AddRange(
                     new Lesson { Id = Guid.NewGuid(), Title = "Geniş Zaman (Simple Present Tense)", Description = "Günlük rutinlerimizi ve genel gerçekleri ifade ederken kullandığımız temel zaman kalıpları.", Level = "beginner", DurationMinutes = 15,
                         Content = "## Geniş Zaman (Simple Present Tense)\n\n### Ne Zaman Kullanılır?\n- Alışkanlıklar ve rutinler: *I wake up at 7 every day.*\n- Genel gerçekler: *The sun rises in the east.*\n- Programlar: *The train leaves at 9 AM.*\n\n### Yapı\n| Özne | Yardımcı | Fiil |\n|------|----------|------|\n| I / You / We / They | — | work, play |\n| He / She / It | — | works, plays |\n\n### Soru\n- **Do** you work here? → Yes, I **do**.\n- **Does** she drive? → No, she **doesn't**.\n\n### Olumsuz\n- I **don't** like coffee.\n- He **doesn't** watch TV.\n\n### Örnek Cümleler\n1. She **reads** a book every night.\n2. They **don't** eat meat.\n3. **Does** he speak French? Yes, he **does**.\n4. Water **boils** at 100°C.\n5. I **play** football on Sundays." },
 

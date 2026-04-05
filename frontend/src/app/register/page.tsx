@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "react-hot-toast";
 
 export default function Register() {
   const router = useRouter();
@@ -22,14 +23,15 @@ export default function Register() {
         body: JSON.stringify(formData)
       });
       if (res.ok) {
-        alert("Kayıt Başarılı! Öğrenme yolculuğuna hoş geldin.");
+        localStorage.setItem("isLoggedIn", "true");
+        toast.success("Kayıt Başarılı! Öğrenme yolculuğuna hoş geldin.", { icon: '🎓' });
         router.push("/profile");
       } else {
-        alert("Kayıt işlemi başarısız oldu. Girdiğin bilgileri kontrol et.");
+        toast.error("Kayıt işlemi başarısız oldu. Girdiğin bilgileri kontrol et.");
       }
     } catch (error) {
       console.error(error);
-      alert("Sunucuya bağlanılamadı.");
+      toast.error("Sunucuya bağlanılamadı.");
     }
   };
 
