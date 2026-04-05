@@ -17,7 +17,7 @@ export default function Exams() {
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
   useEffect(() => {
-    fetch("http://localhost:5050/v1/exams?limit=10")
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}`}/v1/exams?limit=10`)
       .then(res => res.json())
       .then(data => { if (data?.data) setExams(data.data); })
       .catch(console.error);
@@ -26,7 +26,7 @@ export default function Exams() {
   const startExam = async (examId: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5050/v1/exams/${examId}/questions`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/exams/${examId}/questions`);
       const data = await res.json();
       setActiveExam(data);
       setAnswers([]);
@@ -49,7 +49,7 @@ export default function Exams() {
     if (!activeExam) return;
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5050/v1/exams/${activeExam.examId}/submit`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/exams/${activeExam.examId}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

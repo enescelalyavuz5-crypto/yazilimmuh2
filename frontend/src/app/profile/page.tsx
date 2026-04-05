@@ -18,7 +18,7 @@ export default function Profile() {
     if (!id) return;
 
     // İstatistikler
-    fetch(`http://localhost:5050/v1/users/${id}/statistics`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${id}/statistics`)
       .then(res => res.json())
       .then(data => {
         if (data && typeof data.memorizedWordsCount !== "undefined") setStats(data);
@@ -26,7 +26,7 @@ export default function Profile() {
       .catch(console.error);
 
     // Favori kelimeler
-    fetch(`http://localhost:5050/v1/words/favorites?userId=${id}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/words/favorites?userId=${id}`)
       .then(res => res.json())
       .then(data => { if (data?.data) setFavorites(data.data); })
       .catch(console.error);
@@ -37,7 +37,7 @@ export default function Profile() {
     setRemovingId(wordId);
     try {
       const res = await fetch(
-        `http://localhost:5050/v1/words/${wordId}/favorite?userId=${userId}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/words/${wordId}/favorite?userId=${userId}`,
         { method: "DELETE" }
       );
       if (res.ok) {

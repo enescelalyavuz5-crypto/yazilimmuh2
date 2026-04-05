@@ -14,7 +14,7 @@ export default function Words() {
   }, []);
 
   useEffect(() => {
-    fetch(`http://localhost:5050/v1/words?limit=20`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/words?limit=20`)
       .then(res => res.json())
       .then(data => { if (data?.data) setWords(data.data); })
       .catch(console.error);
@@ -23,7 +23,7 @@ export default function Words() {
   // Kullanıcının favorilerini yükle
   useEffect(() => {
     if (!userId) return;
-    fetch(`http://localhost:5050/v1/words/favorites?userId=${userId}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/words/favorites?userId=${userId}`)
       .then(res => res.json())
       .then(data => {
         if (data?.data) {
@@ -44,7 +44,7 @@ export default function Words() {
 
     try {
       const res = await fetch(
-        `http://localhost:5050/v1/words/${wordId}/favorite?userId=${userId}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/words/${wordId}/favorite?userId=${userId}`,
         { method: isFav ? "DELETE" : "POST" }
       );
 
