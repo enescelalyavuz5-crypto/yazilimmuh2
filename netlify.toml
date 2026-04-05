@@ -6,3 +6,6 @@
 [build.environment]
   NEXT_PUBLIC_API_URL = "https://yazilimmuh1.onrender.com"
   NPM_FLAGS = "--include=dev"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
