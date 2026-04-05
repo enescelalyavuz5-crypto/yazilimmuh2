@@ -1,0 +1,27 @@
+
+> frontend@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.2 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.101:3000
+✓ Ready in 503ms
+
+ GET /lessons 200 in 834ms (next.js: 310ms, application-code: 524ms)
+✓ Compiled in 102ms
+ GET /lessons 200 in 248ms (next.js: 100ms, application-code: 148ms)
+ GET /lessons 200 in 26ms (next.js: 7ms, application-code: 19ms)
+ GET /lessons 200 in 74ms (next.js: 7ms, application-code: 66ms)
+ GET /lessons 200 in 89ms (next.js: 6ms, application-code: 83ms)
+ GET /exams 200 in 95ms (next.js: 53ms, application-code: 42ms)
+ GET /profile 200 in 97ms (next.js: 54ms, application-code: 43ms)
+✓ Compiled in 101ms
+ GET /profile 200 in 60ms (next.js: 4ms, application-code: 56ms)
+ GET /profile 200 in 26ms (next.js: 3ms, application-code: 23ms)
+✓ Compiled in 31ms
+✓ Compiled in 47ms
+▲ Next.js 16.2.2 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.101:3000
+✓ Ready in 472ms
+
