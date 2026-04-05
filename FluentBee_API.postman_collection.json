@@ -181,6 +181,22 @@
           }
         },
         {
+          "name": "Sınav Sonucu Güncelle",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/v1/users/{{userId}}/exam-results/BURAYA_RESULT_ID", "host": ["{{base_url}}"], "path": ["v1", "users", "{{userId}}", "exam-results", "BURAYA_RESULT_ID"] },
+            "body": { "mode": "raw", "raw": "{\n  \"score\": 95,\n  \"answers\": \"[]\"\n}" }
+          }
+        },
+        {
+          "name": "Tüm Kursları Getir",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/v1/courses", "host": ["{{base_url}}"], "path": ["v1", "courses"] }
+          }
+        },
+        {
           "name": "Sertifikaları Getir",
           "request": {
             "method": "GET",

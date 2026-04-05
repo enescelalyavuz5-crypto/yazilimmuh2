@@ -13,6 +13,17 @@
 
 ---
 
+## 🎬 Proje Tanıtım Videoları
+
+### 👤 Enes Celal Yavuz — Demo Videosu
+[![Enes Celal Yavuz Demo](https://img.youtube.com/vi/Ffh-dk_AuI8/0.jpg)](https://www.youtube.com/watch?v=Ffh-dk_AuI8)
+
+### 👤 Ali Şeker — Demo Videosu
+> *Bekleniyor... (Ali kanka videonu yükleyince buraya ekleyelim!)*
+
+---
+
+
 ## 🌐 Canlı Deployment Adresleri
 
 | Servis | URL |
