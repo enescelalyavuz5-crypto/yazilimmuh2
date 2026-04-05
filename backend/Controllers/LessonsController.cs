@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FluentBee.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using FluentBee.Api.Models;
 
 namespace FluentBee.Api.Controllers
 {

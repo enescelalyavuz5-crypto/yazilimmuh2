@@ -53,8 +53,8 @@ export default function Lessons() {
 
   useEffect(() => {
     const url = levelFilter
-      ? `http://localhost:5000/v1/lessons?limit=10&level=${levelFilter}`
-      : "http://localhost:5000/v1/lessons?limit=10";
+      ? `http://localhost:5050/v1/lessons?limit=10&level=${levelFilter}`
+      : "http://localhost:5050/v1/lessons?limit=10";
     fetch(url)
       .then(res => res.json())
       .then(data => { if (data?.data) setLessons(data.data); })
@@ -65,7 +65,7 @@ export default function Lessons() {
     setLoading(true);
     setCompleted(false);
     try {
-      const res = await fetch(`http://localhost:5000/v1/lessons/${id}`);
+      const res = await fetch(`http://localhost:5050/v1/lessons/${id}`);
       const data = await res.json();
       setActiveLesson(data);
     } catch {
@@ -84,7 +84,7 @@ export default function Lessons() {
     setCompleting(true);
     try {
       const res = await fetch(
-        `http://localhost:5000/v1/lessons/${activeLesson.id}/complete?userId=${userId}`,
+        `http://localhost:5050/v1/lessons/${activeLesson.id}/complete?userId=${userId}`,
         { method: "POST" }
       );
       const data = await res.json();

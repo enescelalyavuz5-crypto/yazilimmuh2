@@ -57,8 +57,9 @@ namespace FluentBee.Api.Data
                         Content = "## Passive Voice (Edilgen Yapı)\n\n### Neden Kullanılır?\n- Eylemi yapan bilinmiyorsa: *The window was broken.*\n- Yapan önemsizse: *The report was submitted on time.*\n- Akademik/resmi bir üslup için.\n\n### Yapı\n**BE (doğru zamanda) + Past Participle (V3)**\n\n### Zaman Dönüşümleri\n| Zaman | Active | Passive |\n|-------|--------|---------|\n| Present Simple | She writes a report. | A report **is written**. |\n| Past Simple | They built the bridge. | The bridge **was built**. |\n| Future | He will send the email. | The email **will be sent**. |\n| Present Perfect | She has fixed the car. | The car **has been fixed**. |\n\n### By — Kim Tarafından?\n- *The novel **was written by** Orhan Pamuk.*\n- *The contract **was signed by** the manager.*\n\n### Örnek Cümleler\n1. English **is spoken** all over the world.\n2. The thief **was caught** by the police.\n3. The project **will be completed** next week.\n4. This building **was designed** by a famous architect.\n5. Mistakes **were made**, but lessons **were learned**." }
                 );
             }
+        }
 
-            if (!context.Exams.Any())
+        if (!context.Exams.Any())
             {
                 context.Exams.AddRange(
                     new Exam { Id = Guid.NewGuid(), Title = "A1 Temel Seviye Sertifika Sınavı", Level = "A1" },
