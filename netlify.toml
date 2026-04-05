@@ -5,4 +5,4 @@
 
 [build.environment]
   NEXT_PUBLIC_API_URL = "https://yazilimmuh1.onrender.com"
-  NODE_ENV = "production"
+  NPM_FLAGS = "--include=dev"
