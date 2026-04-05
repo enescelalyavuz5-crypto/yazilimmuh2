@@ -3,6 +3,7 @@ using FluentBee.Api.Services;
 
 namespace FluentBee.Api.Controllers
 {
+    // Author: Ali Şeker (AI Modülü)
     [ApiController]
     [Route("v1/ai")]
     public class AiController : ControllerBase
