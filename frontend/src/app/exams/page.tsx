@@ -17,7 +17,7 @@ export default function Exams() {
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}`}/v1/exams?limit=10`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/exams?limit=10`)
       .then(res => res.json())
       .then(data => { if (data?.data) setExams(data.data); })
       .catch(console.error);

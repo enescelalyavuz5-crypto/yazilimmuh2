@@ -1,0 +1,26 @@
+﻿ M backend/Controllers/AiController.cs
+ M backend/Controllers/ExamsController.cs
+ M backend/Data/DbSeeder.cs
+ D backend/Migrations/20260403174827_InitialCreate.Designer.cs
+ D backend/Migrations/20260403174827_InitialCreate.cs
+ D backend/Migrations/20260403175131_AddWordsAndLessons.Designer.cs
+ D backend/Migrations/20260403175131_AddWordsAndLessons.cs
+ D backend/Migrations/20260403180831_AddAliModels.Designer.cs
+ D backend/Migrations/20260403180831_AddAliModels.cs
+ M backend/Migrations/ApplicationDbContextModelSnapshot.cs
+ M backend/appsettings.json
+ M backend/backend.csproj
+ D backend/backend.slnx
+ M frontend/package-lock.json
+ M frontend/package.json
+ M frontend/src/app/exams/page.tsx
+ M frontend/src/app/layout.tsx
+ M frontend/src/app/register/page.tsx
+?? backend/.vs/
+?? backend/Migrations/20260405191351_InitialSqlServer.Designer.cs
+?? backend/Migrations/20260405191351_InitialSqlServer.cs
+?? backend/Services/
+?? backend/debug_log.txt
+?? backend/port5050_log.txt
+?? backend/startup_log.txt
+?? status.txt

@@ -54,7 +54,7 @@ export default function Lessons() {
   useEffect(() => {
     const url = levelFilter
       ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/lessons?limit=10&level=${levelFilter}`
-      : `${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}`}/v1/lessons?limit=10`;
+      : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/lessons?limit=10`;
     fetch(url)
       .then(res => res.json())
       .then(data => { if (data?.data) setLessons(data.data); })

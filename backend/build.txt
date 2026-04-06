@@ -1,0 +1,11 @@
+﻿  Geri y├╝klenecek projeler belirleniyor...
+  Geri y├╝kleme i├ğin t├╝m projeler g├╝ncel.
+C:\projects\yazilimmuh1\backend\Controllers\LessonsController.cs(75,30): error CS0246: 'ExamResult' t├╝r├╝ veya ad alan─▒ ad─▒ bulunamad─▒ (bir using y├Ânergeniz veya derleme ba┼şvurunuz mu eksik?) [C:\projects\yazilimmuh1\backend\backend.csproj]
+
+Olu┼şturma BA┼ŞARISIZ OLDU.
+
+C:\projects\yazilimmuh1\backend\Controllers\LessonsController.cs(75,30): error CS0246: 'ExamResult' t├╝r├╝ veya ad alan─▒ ad─▒ bulunamad─▒ (bir using y├Ânergeniz veya derleme ba┼şvurunuz mu eksik?) [C:\projects\yazilimmuh1\backend\backend.csproj]
+    0 Uyar─▒
+    1 Hata
+
+Ge├ğen S├╝re 00:00:01.21

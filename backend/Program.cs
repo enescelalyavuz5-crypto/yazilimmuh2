@@ -10,8 +10,17 @@ builder.Services.AddOpenApi();
 
 // Add Database Context
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=fluentbee.db";
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+
+if (connectionString.Contains("Server=") || connectionString.Contains("Database=") || connectionString.Contains("database.windows.net"))
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(connectionString));
+}
+else
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlite(connectionString));
+}
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -38,6 +47,7 @@ if (app.Environment.IsDevelopment())
     {
         var services = scope.ServiceProvider;
         var context = services.GetRequiredService<FluentBee.Api.Data.ApplicationDbContext>();
+        context.Database.EnsureCreated(); // Migration for Render / Production
         FluentBee.Api.Data.DbSeeder.Seed(context);
     }
 }
@@ -51,6 +61,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<FluentBee.Api.Data.ApplicationDbContext>();
+    context.Database.EnsureCreated(); // Migration for Render / Production
     FluentBee.Api.Data.DbSeeder.Seed(context);
 }
 

@@ -1,0 +1,5 @@
+﻿da6ac71 Kodlar main'e aktar─▒l─▒yor
+12c1f30 fix: update backend port and sync API configurations
+27021da fix(backend): Store MapOpenApi and ensure DbSeeder runs
+44e5805 feat(ui): Add and style login/register pages with Emerald theme
+0ad131a chore(ui): Update favicon to FluentBee logo

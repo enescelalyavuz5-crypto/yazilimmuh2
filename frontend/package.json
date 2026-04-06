@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@netlify/plugin-nextjs": "^5.15.9",
     "@tailwindcss/postcss": "^4.2.2",
     "next": "^15.2.6",
     "postcss": "^8.5.8",
