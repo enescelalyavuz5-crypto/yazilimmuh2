@@ -9,9 +9,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // Add Database Context
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Server=(local);Database=FluentBeeDb;Trusted_Connection=True;TrustServerCertificate=True;";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=fluentbee.db";
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlite(connectionString));
 
 // Add CORS
 builder.Services.AddCors(options =>
