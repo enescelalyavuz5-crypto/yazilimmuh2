@@ -191,5 +191,15 @@ namespace FluentBee.Api.Controllers
             var certs = await _context.Certificates.Where(c => c.UserId == userId).ToListAsync();
             return Ok(new { data = certs });
         }
+
+        [HttpGet("{userId}/exam-results")]
+        public async Task<IActionResult> GetExamResults(Guid userId)
+        {
+            var results = await _context.ExamResults
+                .Where(er => er.UserId == userId)
+                .Include(er => er.Exam)
+                .ToListAsync();
+            return Ok(new { data = results });
+        }
     }
 }

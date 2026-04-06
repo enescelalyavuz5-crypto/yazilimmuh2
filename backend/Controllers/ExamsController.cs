@@ -78,6 +78,21 @@ namespace FluentBee.Api.Controllers
                     {
                         user.EnglishLevel = exam.Level ?? "A1";
                         user.UpdatedAt = DateTime.UtcNow;
+                        
+                        var certTitle = $"{exam.Title} ({exam.Level})";
+                        var hasCert = await _context.Certificates.AnyAsync(c => c.UserId == dto.UserId && c.Title == certTitle);
+                        if (!hasCert)
+                        {
+                            var cert = new Certificate
+                            {
+                                Id = Guid.NewGuid(),
+                                UserId = dto.UserId,
+                                Title = certTitle,
+                                Issuer = "FluentBee Language Institute",
+                                IssuedAt = DateTime.UtcNow
+                            };
+                            _context.Certificates.Add(cert);
+                        }
                     }
                 }
 

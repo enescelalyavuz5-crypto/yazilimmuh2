@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import CertificateModal from "@/components/CertificateModal";
 
 export default function Profile() {
   const [stats, setStats] = useState({ memorizedWordsCount: 0, completedLessonsCount: 0 });
@@ -13,6 +14,11 @@ export default function Profile() {
   const [favorites, setFavorites] = useState<any[]>([]);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [savingSettings, setSavingSettings] = useState(false);
+
+  // Exam & Cert States
+  const [exams, setExams] = useState<any[]>([]);
+  const [certificates, setCertificates] = useState<any[]>([]);
+  const [selectedCert, setSelectedCert] = useState<any | null>(null);
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -48,6 +54,30 @@ export default function Profile() {
     fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/words/favorites?userId=${id}`)
       .then(res => res.json())
       .then(data => { if (data?.data) setFavorites(data.data); })
+      .catch(console.error);
+
+    // Sınav Geçmişi
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${id}/exam-results`)
+      .then(res => res.json())
+      .then(data => { 
+        if (data?.data) {
+          // Group by examId to find highest score
+          const bestScores: { [key: string]: any } = {};
+          data.data.forEach((er: any) => {
+            if (!er.exam) return;
+            if (!bestScores[er.examId] || er.score > bestScores[er.examId].score) {
+              bestScores[er.examId] = er;
+            }
+          });
+          setExams(Object.values(bestScores));
+        }
+      })
+      .catch(console.error);
+
+    // Sertifikalar
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${id}/certificates`)
+      .then(res => res.json())
+      .then(data => { if (data?.data) setCertificates(data.data); })
       .catch(console.error);
   }, []);
 
@@ -168,6 +198,67 @@ export default function Profile() {
         </div>
       </div>
 
+      {/* Exam History & Certificates */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-8 border-t border-white/10">
+        
+        {/* Sol Kolon - Exam History */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <span className="text-amber-400">📝</span> Sınav Geçmişim
+          </h2>
+          {exams.length === 0 ? (
+            <div className="text-center py-8 rounded-2xl bg-white/5 border border-white/5 border-dashed text-neutral-500">
+              Henüz bir sınava katılmadın.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {exams.map(e => {
+                const correctCount = Math.round((e.score * 5) / 100);
+                const passed = e.score >= 60;
+                return (
+                  <div key={e.id} className="p-4 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center group hover:bg-white/10 transition-colors">
+                    <div>
+                      <h3 className="font-bold text-white group-hover:text-amber-400 transition-colors">{e.exam?.title}</h3>
+                      <p className="text-sm text-neutral-400">Seviyesi: {e.exam?.level}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className={`px-3 py-1 rounded-full text-sm font-bold border ${passed ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}`}>
+                        {correctCount}/5 Doğru
+                      </div>
+                      <p className="text-xs text-neutral-500 mt-1">{new Date(e.completedAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Sağ Kolon - Sertifikalar */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <span className="text-amber-400">🎓</span> Sertifikalarım
+          </h2>
+          {certificates.length === 0 ? (
+            <div className="text-center py-8 rounded-2xl bg-white/5 border border-white/5 border-dashed text-neutral-500">
+              Henüz kazandığın bir sertifika yok. Sınavları geçerek kazanabilirsin!
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {certificates.map(c => (
+                <div key={c.id} 
+                     onClick={() => setSelectedCert(c)}
+                     className="p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-900/20 border border-amber-500/30 cursor-pointer hover:border-amber-400 hover:scale-[1.02] transition-all flex flex-col items-center text-center">
+                  <div className="text-4xl mb-2">🏅</div>
+                  <h3 className="font-bold text-sm text-amber-200">{c.title}</h3>
+                  <p className="text-xs text-amber-500/70 mt-2">{new Date(c.issuedAt).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Favori Kelimeler */}
       <div className="space-y-4 border-t border-white/10 pt-8">
         <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -222,6 +313,16 @@ export default function Profile() {
           </button>
         </div>
       </div>
+
+      {/* Certificate Modal Overlay */}
+      {selectedCert && (
+        <CertificateModal
+          onClose={() => setSelectedCert(null)}
+          userName={userName}
+          examTitle={selectedCert.title}
+          date={selectedCert.issuedAt}
+        />
+      )}
     </div>
   );
 }
