@@ -8,6 +8,8 @@ import { toast } from "react-hot-toast";
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [goal, setGoal] = useState<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -16,14 +18,65 @@ export default function Navbar() {
     const check = () => setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
     check(); // Her route değişiminde ve ilk yüklemede kontrol et
 
-    window.addEventListener("auth-change", check);
-    window.addEventListener("storage", check);
+    const fetchGoal = async () => {
+      const uId = localStorage.getItem("userId");
+      if (!uId) return;
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${uId}`);
+        const data = await res.json();
+        if (data.dailyGoalMinutes) setGoal(data.dailyGoalMinutes);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    if (localStorage.getItem("isLoggedIn") === "true") {
+      fetchGoal();
+    }
+
+    const onStorageOrAuth = () => {
+      check();
+      if (localStorage.getItem("isLoggedIn") === "true") fetchGoal();
+    };
+
+    window.addEventListener("auth-change", onStorageOrAuth);
+    window.addEventListener("storage", onStorageOrAuth);
+    window.addEventListener("goal-updated", fetchGoal);
 
     return () => {
-      window.removeEventListener("auth-change", check);
-      window.removeEventListener("storage", check);
+      window.removeEventListener("auth-change", onStorageOrAuth);
+      window.removeEventListener("storage", onStorageOrAuth);
+      window.removeEventListener("goal-updated", fetchGoal);
     };
-  }, [pathname]); // pathname değişince de kontrol et
+  }, [pathname]);
+
+  // DAILY GOAL TRACKER
+  useEffect(() => {
+    if (!isLoggedIn || !goal) return;
+
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    const storageKey = `study_spent_${today}`;
+    
+    timerRef.current = setInterval(() => {
+      let spent = parseInt(localStorage.getItem(storageKey) || "0");
+      spent += 1;
+      localStorage.setItem(storageKey, spent.toString());
+
+      if (spent === goal) {
+        toast.success(`Harika! Günlük hedefin olan ${goal} dakikaya ulaştın! 🎉`, {
+          icon: '🏆',
+          duration: 8000,
+          style: { background: '#10B981', color: '#000', fontWeight: 'bold' }
+        });
+      }
+    }, 60000); // 1 minute
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isLoggedIn, goal]); // pathname değişince de kontrol et
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");

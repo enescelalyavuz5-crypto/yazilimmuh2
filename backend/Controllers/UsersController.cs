@@ -16,6 +16,21 @@ namespace FluentBee.Api.Controllers
             _context = context;
         }
 
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetProfile(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound();
+            return Ok(new { 
+                id = user.Id, 
+                firstName = user.FirstName, 
+                lastName = user.LastName, 
+                email = user.Email, 
+                englishLevel = user.EnglishLevel, 
+                dailyGoalMinutes = user.DailyGoalMinutes 
+            });
+        }
+
         [HttpPut("{userId}/profile")]
         public async Task<IActionResult> UpdateProfile(Guid userId, [FromBody] ProfileUpdateDto dto)
         {

@@ -4,10 +4,15 @@ import { toast } from "react-hot-toast";
 
 export default function Profile() {
   const [stats, setStats] = useState({ memorizedWordsCount: 0, completedLessonsCount: 0 });
+  const [goal, setGoal] = useState(30);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [level, setLevel] = useState("A1");
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("Kullanıcı");
   const [favorites, setFavorites] = useState<any[]>([]);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [savingSettings, setSavingSettings] = useState(false);
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -15,6 +20,21 @@ export default function Profile() {
     setUserId(id);
     setUserName(name);
     if (!id) return;
+
+    // Kullanıcı Detayları (Profil)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.firstName) {
+          setFirstName(data.firstName);
+          setLastName(data.lastName);
+          setGoal(data.dailyGoalMinutes);
+          setLevel(data.englishLevel.toUpperCase());
+          setUserName(`${data.firstName} ${data.lastName}`);
+          localStorage.setItem("userName", `${data.firstName} ${data.lastName}`);
+        }
+      })
+      .catch(console.error);
 
     // İstatistikler
     fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${id}/statistics`)
@@ -50,6 +70,37 @@ export default function Profile() {
     }
   };
 
+  const saveSettings = async () => {
+    if (!userId) return;
+    setSavingSettings(true);
+    try {
+      // Profil (İsim Soyisim) Güncelle
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${userId}/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, lastName })
+      });
+      // Günlük Hedef Güncelle
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${userId}/study-goal`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dailyGoalMinutes: goal })
+      });
+      
+      setUserName(`${firstName} ${lastName}`);
+      localStorage.setItem("userName", `${firstName} ${lastName}`);
+      
+      // Notify running timer in Navbar
+      window.dispatchEvent(new Event("goal-updated"));
+      
+      toast.success("Profil ayarları kaydedildi!");
+    } catch {
+      toast.error("Ayarlar kaydedilemedi.");
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 
   return (
@@ -61,23 +112,58 @@ export default function Profile() {
         </div>
         <div>
           <h1 className="text-4xl font-bold mb-2">{userName}</h1>
-          <p className="text-neutral-400">Intermediate Level learner</p>
+          <p className="text-neutral-400 font-medium">{level} Level learner</p>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="space-y-6 max-w-2xl">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <span className="text-amber-400">📊</span> Learning Statistics
-        </h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-            <div className="text-4xl font-black text-white mb-2">{stats.memorizedWordsCount}</div>
-            <div className="text-sm text-neutral-400 uppercase tracking-wider font-bold">Memorized Words</div>
+      {/* Stats + Settings */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Sol Kolon - Stats */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <span className="text-amber-400">📊</span> Learning Statistics
+          </h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="text-4xl font-black text-white mb-2">{stats.memorizedWordsCount}</div>
+              <div className="text-sm text-neutral-400 uppercase tracking-wider font-bold">Memorized Words</div>
+            </div>
+            <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="text-4xl font-black text-white mb-2">{stats.completedLessonsCount}</div>
+              <div className="text-sm text-neutral-400 uppercase tracking-wider font-bold">Completed Lessons</div>
+            </div>
           </div>
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-            <div className="text-4xl font-black text-white mb-2">{stats.completedLessonsCount}</div>
-            <div className="text-sm text-neutral-400 uppercase tracking-wider font-bold">Completed Lessons</div>
+        </div>
+
+        {/* Sağ Kolon - Profile Settings */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <span className="text-amber-400">⚙️</span> Profile Settings
+          </h2>
+          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-400 mb-1">First Name</label>
+                <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)}
+                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-400 mb-1">Last Name</label>
+                <input type="text" value={lastName} onChange={e => setLastName(e.target.value)}
+                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-neutral-400 mb-1">Daily Study Goal (Minutes)</label>
+              <div className="flex gap-2">
+                <input type="number" min="1" value={goal} onChange={e => setGoal(parseInt(e.target.value))}
+                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white" />
+                <button onClick={saveSettings} disabled={savingSettings}
+                  className="bg-amber-500/20 hover:bg-amber-500 hover:text-black border border-amber-500/50 text-amber-400 font-bold px-6 py-2 rounded-lg transition-all disabled:opacity-50">
+                  {savingSettings ? "..." : "Save"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

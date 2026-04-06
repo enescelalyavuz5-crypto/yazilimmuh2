@@ -70,6 +70,17 @@ namespace FluentBee.Api.Controllers
                     CompletedAt = DateTime.UtcNow
                 };
                 _context.ExamResults.Add(result);
+
+                if (score >= 60)
+                {
+                    var user = await _context.Users.FindAsync(dto.UserId);
+                    if (user != null)
+                    {
+                        user.EnglishLevel = exam.Level ?? "A1";
+                        user.UpdatedAt = DateTime.UtcNow;
+                    }
+                }
+
                 await _context.SaveChangesAsync();
             }
 
