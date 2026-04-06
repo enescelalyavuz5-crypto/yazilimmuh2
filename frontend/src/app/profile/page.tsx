@@ -57,26 +57,36 @@ export default function Profile() {
     // Kullanıcı Detayları (Profil)
     fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${id}`)
       .then(async (res) => {
+        console.log("Profile fetch status:", res.status);
         if (res.status === 404) {
           localStorage.removeItem("isLoggedIn");
           localStorage.removeItem("userId");
+          localStorage.removeItem("userName");
+          localStorage.removeItem("userEmail");
           window.dispatchEvent(new Event("auth-change"));
           window.location.href = "/";
           return null;
         }
+        if (!res.ok) return null;
         return res.json();
       })
       .then(data => {
-        if (data && data.firstName) {
-          setFirstName(data.firstName);
-          setLastName(data.lastName);
-          setGoal(data.dailyGoalMinutes);
-          setLevel(data.englishLevel.toUpperCase());
-          setUserName(`${data.firstName} ${data.lastName}`);
-          localStorage.setItem("userName", `${data.firstName} ${data.lastName}`);
+        console.log("Profile data:", data);
+        if (data) {
+          const fn = data.firstName || "";
+          const ln = data.lastName || "";
+          setFirstName(fn);
+          setLastName(ln);
+          if (data.dailyGoalMinutes) setGoal(data.dailyGoalMinutes);
+          if (data.englishLevel) setLevel(data.englishLevel.toUpperCase());
+          if (fn) {
+            const fullName = `${fn} ${ln}`.trim();
+            setUserName(fullName);
+            localStorage.setItem("userName", fullName);
+          }
         }
       })
-      .catch(console.error);
+      .catch(err => console.error("Profile fetch error:", err));
 
     // İstatistikler
     fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${id}/statistics`)

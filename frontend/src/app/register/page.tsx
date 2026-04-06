@@ -24,20 +24,27 @@ export default function Register() {
       });
       if (res.ok) {
         const data = await res.json();
+        console.log("Register response:", data);
+        const uid = data.id || data.user?.id || "";
+        const fn = data.firstName || data.user?.firstName || formData.firstName;
+        const ln = data.lastName || data.user?.lastName || formData.lastName;
+        const em = data.email || data.user?.email || formData.email;
         localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userId", data.id || data.user?.id);
-        localStorage.setItem("userName", `${data.firstName || data.user?.firstName} ${data.lastName || data.user?.lastName}`);
-        localStorage.setItem("userEmail", data.email || data.user?.email);
+        localStorage.setItem("userId", uid);
+        localStorage.setItem("userName", `${fn} ${ln}`);
+        localStorage.setItem("userEmail", em);
         window.dispatchEvent(new Event("auth-change"));
         toast.success("Kayıt Başarılı! Öğrenme yolculuğuna hoş geldin.", { icon: '🎓' });
         router.push("/profile");
+      } else if (res.status === 409) {
+        toast.error("Bu e-posta zaten kayıtlı! Giriş Yap sayfasından dene.", { icon: '📧', duration: 5000 });
       } else {
         const errData = await res.json().catch(() => null);
-        toast.error(errData?.message || "Kayıt işlemi başarısız oldu. Lütfen tekrar dene.");
+        toast.error(errData?.message || "Kayıt işlemi başarısız oldu.");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Sunucuya bağlanılamadı. Lütfen internetini kontrol et.");
+      toast.error("Sunucuya bağlanılamadı. Backend çalışıyor mu?");
     }
   };
 
