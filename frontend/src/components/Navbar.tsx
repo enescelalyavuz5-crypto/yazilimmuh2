@@ -7,10 +7,12 @@ import { toast } from "react-hot-toast";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
+    setMounted(true);
     const check = () => setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
     check(); // Her route değişiminde ve ilk yüklemede kontrol et
 
@@ -69,7 +71,7 @@ export default function Navbar() {
                   }`}>
                   AI Tutor ✨
                 </Link>
-                {isLoggedIn && (
+                {mounted && isLoggedIn && (
                   <Link href="/profile"
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                       pathname === "/profile"
@@ -83,7 +85,7 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            {isLoggedIn ? (
+            {!mounted ? null : isLoggedIn ? (
                <button onClick={handleLogout} className="bg-red-500/10 hover:bg-red-500/20 border border-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all">
                 Çıkış Yap
               </button>
