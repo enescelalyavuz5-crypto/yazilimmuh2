@@ -25,6 +25,27 @@ export default function Profile() {
   const [exams, setExams] = useState<any[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
   const [selectedCert, setSelectedCert] = useState<any | null>(null);
+  const [spentTime, setSpentTime] = useState("0 dakika, 0 saniye");
+  const [progressPercent, setProgressPercent] = useState(0);
+
+  useEffect(() => {
+    const updateTime = () => {
+      const today = new Date().toISOString().split("T")[0];
+      const savedSeconds = parseInt(localStorage.getItem(`study_seconds_${today}`) || "0");
+      const mins = Math.floor(savedSeconds / 60);
+      const secs = savedSeconds % 60;
+      setSpentTime(`${mins} dakika, ${secs} saniye`);
+
+      setGoal(prevGoal => {
+         const goalSecs = (prevGoal || 1) * 60;
+         setProgressPercent(Math.min((savedSeconds / goalSecs) * 100, 100));
+         return prevGoal;
+      });
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const id = localStorage.getItem("userId");
@@ -35,7 +56,16 @@ export default function Profile() {
 
     // Kullanıcı Detayları (Profil)
     fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${id}`)
-      .then(res => res.json())
+      .then(async (res) => {
+        if (res.status === 404) {
+          localStorage.removeItem("isLoggedIn");
+          localStorage.removeItem("userId");
+          window.dispatchEvent(new Event("auth-change"));
+          window.location.href = "/";
+          return null;
+        }
+        return res.json();
+      })
       .then(data => {
         if (data && data.firstName) {
           setFirstName(data.firstName);
@@ -294,6 +324,16 @@ export default function Profile() {
                 className="mt-3 w-full bg-emerald-500/20 hover:bg-emerald-500 hover:text-black border border-emerald-500/50 text-emerald-400 font-bold px-6 py-2 rounded-lg transition-all disabled:opacity-50">
                 {savingGoal ? "Kaydediliyor..." : "Hedefi Kaydet"}
               </button>
+
+              <div className="mt-6 pt-6 border-t border-white/5">
+                <div className="flex justify-between items-end mb-2">
+                   <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider">Bugünün İlerlemesi</p>
+                   <p className="text-sm font-black text-amber-400">{spentTime}</p>
+                </div>
+                <div className="w-full bg-white/5 rounded-full h-2">
+                   <div className="bg-gradient-to-r from-amber-500 to-emerald-400 h-2 rounded-full transition-all duration-1000" style={{ width: `${progressPercent}%` }}></div>
+                </div>
+              </div>
             </div>
 
             {/* Şifre Değiştir */}

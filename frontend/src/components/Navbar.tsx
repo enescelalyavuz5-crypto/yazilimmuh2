@@ -27,6 +27,16 @@ export default function Navbar() {
     if (!uId) return;
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${uId}`);
+      if (res.status === 404) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("userEmail");
+        setIsLoggedIn(false);
+        setGoal(null);
+        window.dispatchEvent(new Event("auth-change"));
+        return;
+      }
       const data = await res.json();
       if (data.dailyGoalMinutes) setGoal(data.dailyGoalMinutes);
     } catch (e) {
