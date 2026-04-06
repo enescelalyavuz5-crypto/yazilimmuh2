@@ -48,6 +48,48 @@ export default function Lessons() {
   const [levelFilter, setLevelFilter] = useState("");
   const [completed, setCompleted] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [postingComment, setPostingComment] = useState(false);
+
+  const loadComments = async (lessonId: string) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/lessons/${lessonId}/comments`);
+      const data = await res.json();
+      if (data?.data) setComments(data.data);
+    } catch { /* ignore */ }
+  };
+
+  const postComment = async () => {
+    if (!activeLesson || !userId || !newComment.trim()) return;
+    setPostingComment(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/lessons/${activeLesson.id}/comments`,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, content: newComment.trim() }) }
+      );
+      if (res.ok) {
+        setNewComment("");
+        await loadComments(activeLesson.id);
+        toast.success("Yorumun eklendi!");
+      }
+    } catch {
+      toast.error("Yorum eklenemedi.");
+    } finally {
+      setPostingComment(false);
+    }
+  };
+
+  const deleteComment = async (commentId: string, commentUserId: string) => {
+    if (!activeLesson || userId !== commentUserId) return;
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/lessons/${activeLesson.id}/comments/${commentId}`, { method: "DELETE" });
+      setComments(prev => prev.filter(c => c.id !== commentId));
+      toast.success("Yorum silindi.");
+    } catch {
+      toast.error("Yorum silinemedi.");
+    }
+  };
 
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
@@ -64,10 +106,13 @@ export default function Lessons() {
   const openLesson = async (id: string) => {
     setLoading(true);
     setCompleted(false);
+    setComments([]);
+    setNewComment("");
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/lessons/${id}`);
       const data = await res.json();
       setActiveLesson(data);
+      await loadComments(id);
     } catch {
       console.error("Ders yüklenemedi");
     } finally {
@@ -178,6 +223,66 @@ export default function Lessons() {
             }`}>
             {completing ? "Kaydediliyor..." : completed ? "✓ Tamamlandı!" : "✓ Dersi Tamamladım"}
           </button>
+        </div>
+
+        {/* YORUMLAR BÖLÜMÜ */}
+        <div className="mt-12 space-y-4">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <span className="text-amber-400">💬</span> Yorumlar
+            <span className="text-sm font-normal text-neutral-500 bg-white/5 px-2 py-0.5 rounded-full ml-1">{comments.length}</span>
+          </h2>
+
+          {/* Yeni Yorum */}
+          {userId ? (
+            <div className="flex gap-3">
+              <textarea
+                value={newComment}
+                onChange={e => setNewComment(e.target.value)}
+                placeholder="Bu ders hakkında ne düşünüyorsun?"
+                rows={2}
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 outline-none text-white resize-none text-sm"
+              />
+              <button
+                onClick={postComment}
+                disabled={postingComment || !newComment.trim()}
+                className="px-5 py-2 bg-amber-500/20 hover:bg-amber-500 hover:text-black border border-amber-500/40 text-amber-400 font-bold rounded-xl transition-all self-end disabled:opacity-40">
+                {postingComment ? "..." : "Gönder"}
+              </button>
+            </div>
+          ) : (
+            <p className="text-sm text-neutral-500 italic">Yorum yapmak için giriş yapmalısın.</p>
+          )}
+
+          {/* Yorum Listesi */}
+          <div className="space-y-3">
+            {comments.length === 0 ? (
+              <div className="text-center py-8 rounded-2xl bg-white/5 border border-white/5 border-dashed text-neutral-500 text-sm">
+                Henüz yorum yok. İlk yorumu sen yap!
+              </div>
+            ) : (
+              comments.map(c => (
+                <div key={c.id} className="p-4 rounded-xl bg-white/5 border border-white/10 group">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-xs font-bold text-black">
+                        {c.userName?.[0]?.toUpperCase() || "?"}
+                      </div>
+                      <span className="font-semibold text-sm text-white">{c.userName}</span>
+                      <span className="text-xs text-neutral-500">{new Date(c.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    {c.userId === userId && (
+                      <button
+                        onClick={() => deleteComment(c.id, c.userId)}
+                        className="text-xs text-neutral-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+                        Sil
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-sm text-neutral-300 leading-relaxed">{c.content}</p>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
     );

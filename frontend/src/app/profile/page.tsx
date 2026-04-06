@@ -14,6 +14,10 @@ export default function Profile() {
   const [favorites, setFavorites] = useState<any[]>([]);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
 
   // Exam & Cert States
   const [exams, setExams] = useState<any[]>([]);
@@ -131,6 +135,37 @@ export default function Profile() {
     }
   };
 
+  const changePassword = async () => {
+    if (!userId) return;
+    if (!oldPassword || !newPassword || !confirmPassword) { toast.error("Tüm alanları doldurun."); return; }
+    if (newPassword !== confirmPassword) { toast.error("Yeni şifreler eşleşmiyor!"); return; }
+    if (newPassword.length < 4) { toast.error("Şifre en az 4 karakter olmalı."); return; }
+    setChangingPassword(true);
+    try {
+      // Verify old password by attempting login
+      const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: localStorage.getItem("userEmail") || "", password: oldPassword })
+      });
+      if (!loginRes.ok) { toast.error("Eski şifre yanlış!", { icon: "🔒" }); return; }
+      // Update password
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${userId}/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: newPassword })
+      });
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      toast.success("Şifre başarıyla değiştirildi! 🔒");
+    } catch {
+      toast.error("Şifre değiştirilemedi.");
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 
   return (
@@ -191,6 +226,23 @@ export default function Profile() {
                 <button onClick={saveSettings} disabled={savingSettings}
                   className="bg-amber-500/20 hover:bg-amber-500 hover:text-black border border-amber-500/50 text-amber-400 font-bold px-6 py-2 rounded-lg transition-all disabled:opacity-50">
                   {savingSettings ? "..." : "Save"}
+                </button>
+              </div>
+            </div>
+
+            {/* Şifre Değiştir */}
+            <div className="pt-4 border-t border-white/10">
+              <h3 className="text-sm font-bold text-neutral-300 mb-3">🔒 Şifre Değiştir</h3>
+              <div className="space-y-2">
+                <input type="password" placeholder="Eski şifre" value={oldPassword} onChange={e => setOldPassword(e.target.value)}
+                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white text-sm" />
+                <input type="password" placeholder="Yeni şifre" value={newPassword} onChange={e => setNewPassword(e.target.value)}
+                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white text-sm" />
+                <input type="password" placeholder="Yeni şifre (tekrar)" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
+                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white text-sm" />
+                <button onClick={changePassword} disabled={changingPassword}
+                  className="w-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 hover:text-red-300 font-bold py-2 rounded-lg transition-all disabled:opacity-50 text-sm">
+                  {changingPassword ? "Değiştiriliyor..." : "Şifremi Değiştir"}
                 </button>
               </div>
             </div>

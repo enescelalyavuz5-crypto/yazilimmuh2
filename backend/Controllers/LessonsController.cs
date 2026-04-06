@@ -88,6 +88,50 @@ namespace FluentBee.Api.Controllers
         }
 
 
+        // GET /v1/lessons/{lessonId}/comments
+        [HttpGet("{lessonId}/comments")]
+        public async Task<IActionResult> GetComments(Guid lessonId)
+        {
+            var comments = await _context.Comments
+                .Where(c => c.LessonId == lessonId && c.Content != "SYSTEM_COMPLETED")
+                .Include(c => c.User)
+                .OrderByDescending(c => c.CreatedAt)
+                .Select(c => new {
+                    c.Id,
+                    c.Content,
+                    c.CreatedAt,
+                    c.UserId,
+                    userName = (c.User != null ? c.User.FirstName + " " + c.User.LastName : "Anonim")
+                })
+                .ToListAsync();
+            return Ok(new { data = comments });
+        }
+
+        // POST /v1/lessons/{lessonId}/comments
+        public class CommentCreateDto { public Guid UserId { get; set; } public string Content { get; set; } = string.Empty; }
+
+        [HttpPost("{lessonId}/comments")]
+        public async Task<IActionResult> AddComment(Guid lessonId, [FromBody] CommentCreateDto dto)
+        {
+            if (dto.UserId == Guid.Empty) return BadRequest(new { message = "userId gerekli." });
+            if (string.IsNullOrWhiteSpace(dto.Content)) return BadRequest(new { message = "Yorum boş olamaz." });
+
+            var lesson = await _context.Lessons.FindAsync(lessonId);
+            if (lesson == null) return NotFound();
+
+            var comment = new Comment
+            {
+                Id = Guid.NewGuid(),
+                UserId = dto.UserId,
+                LessonId = lessonId,
+                Content = dto.Content.Trim(),
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+            return Ok(new { id = comment.Id, content = comment.Content, createdAt = comment.CreatedAt });
+        }
+
         [HttpDelete("{lessonId}/comments/{commentId}")]
         public async Task<IActionResult> DeleteComment(Guid lessonId, Guid commentId)
         {

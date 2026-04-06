@@ -24,6 +24,7 @@ export default function Login() {
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userId", data.user.id);
         localStorage.setItem("userName", `${data.user.firstName} ${data.user.lastName}`);
+        localStorage.setItem("userEmail", data.user.email);
         window.dispatchEvent(new Event("auth-change"));
         toast.success("Tekrar hoş geldin!", { icon: '👋' });
         router.push("/profile");
