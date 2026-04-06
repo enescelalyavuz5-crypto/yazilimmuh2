@@ -13,7 +13,8 @@ export default function Profile() {
   const [userName, setUserName] = useState("Kullanıcı");
   const [favorites, setFavorites] = useState<any[]>([]);
   const [removingId, setRemovingId] = useState<string | null>(null);
-  const [savingSettings, setSavingSettings] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [savingGoal, setSavingGoal] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -104,34 +105,40 @@ export default function Profile() {
     }
   };
 
-  const saveSettings = async () => {
+  const saveProfile = async () => {
     if (!userId) return;
-    setSavingSettings(true);
+    setSavingProfile(true);
     try {
-      // Profil (İsim Soyisim) Güncelle
       await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${userId}/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firstName, lastName })
       });
-      // Günlük Hedef Güncelle
+      setUserName(`${firstName} ${lastName}`);
+      localStorage.setItem("userName", `${firstName} ${lastName}`);
+      toast.success("İsim bilgileri güncellendi! ✅");
+    } catch {
+      toast.error("İsim güncellenemedi.");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const saveGoal = async () => {
+    if (!userId) return;
+    setSavingGoal(true);
+    try {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${userId}/study-goal`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dailyGoalMinutes: goal })
       });
-      
-      setUserName(`${firstName} ${lastName}`);
-      localStorage.setItem("userName", `${firstName} ${lastName}`);
-      
-      // Notify running timer in Navbar
       window.dispatchEvent(new Event("goal-updated"));
-      
-      toast.success("Profil ayarları kaydedildi!");
+      toast.success(`Günlük hedef ${goal} dakika olarak kaydedildi! 🎯`);
     } catch {
-      toast.error("Ayarlar kaydedilemedi.");
+      toast.error("Hedef güncellenemedi.");
     } finally {
-      setSavingSettings(false);
+      setSavingGoal(false);
     }
   };
 
@@ -206,28 +213,39 @@ export default function Profile() {
             <span className="text-amber-400">⚙️</span> Profile Settings
           </h2>
           <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-neutral-400 mb-1">First Name</label>
-                <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)}
-                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-neutral-400 mb-1">Last Name</label>
-                <input type="text" value={lastName} onChange={e => setLastName(e.target.value)}
-                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white" />
-              </div>
-            </div>
+            {/* İsim Soyisim */}
             <div>
-              <label className="block text-sm font-medium text-neutral-400 mb-1">Daily Study Goal (Minutes)</label>
+              <label className="block text-sm font-bold text-neutral-300 mb-2">👤 Ad Soyad</label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-neutral-500 mb-1">Ad</label>
+                  <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)}
+                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-neutral-500 mb-1">Soyad</label>
+                  <input type="text" value={lastName} onChange={e => setLastName(e.target.value)}
+                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white" />
+                </div>
+              </div>
+              <button onClick={saveProfile} disabled={savingProfile}
+                className="mt-3 w-full bg-amber-500/20 hover:bg-amber-500 hover:text-black border border-amber-500/50 text-amber-400 font-bold px-6 py-2 rounded-lg transition-all disabled:opacity-50">
+                {savingProfile ? "Kaydediliyor..." : "Profili Güncelle"}
+              </button>
+            </div>
+
+            {/* Günlük Hedef */}
+            <div className="pt-2 border-t border-white/10">
+              <label className="block text-sm font-bold text-neutral-300 mb-2">🎯 Günlük Çalışma Hedefi</label>
               <div className="flex gap-2">
                 <input type="number" min="1" value={goal} onChange={e => setGoal(parseInt(e.target.value))}
                   className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white" />
-                <button onClick={saveSettings} disabled={savingSettings}
-                  className="bg-amber-500/20 hover:bg-amber-500 hover:text-black border border-amber-500/50 text-amber-400 font-bold px-6 py-2 rounded-lg transition-all disabled:opacity-50">
-                  {savingSettings ? "..." : "Save"}
-                </button>
+                <span className="flex items-center text-sm text-neutral-400 whitespace-nowrap">dakika</span>
               </div>
+              <button onClick={saveGoal} disabled={savingGoal}
+                className="mt-3 w-full bg-emerald-500/20 hover:bg-emerald-500 hover:text-black border border-emerald-500/50 text-emerald-400 font-bold px-6 py-2 rounded-lg transition-all disabled:opacity-50">
+                {savingGoal ? "Kaydediliyor..." : "Hedefi Kaydet"}
+              </button>
             </div>
 
             {/* Şifre Değiştir */}
