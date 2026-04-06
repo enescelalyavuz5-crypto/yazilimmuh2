@@ -2,47 +2,100 @@
   <img src="fluentbee-banner.png" alt="FluentBee Banner" width="100%">
 </p>
 
-# FluentBee (İngilizce Öğrenme Platformu)
+# FluentBee — İngilizce Öğrenme Platformu
 
-Bu proje, Yazılım Mühendisliği dersi kapsamında geliştirilmiş bir İngilizce öğrenme ve pratik yapma platformudur. Sistem, öğrencilerin online olarak İngilizce eğitimleri almasını, kelime dağarcığını geliştirmesini, kendilerini test etmelerini ve yapay zeka destekli dilbilgisi geri bildirimleri almasını sağlamaktadır.
+> Yazılım Mühendisliği dersi kapsamında geliştirilmiş, yapay zeka destekli modern İngilizce öğrenme ve pratik yapma platformu.
 
-## Kullanılan Teknolojiler
-- **Frontend / Web Arayüzü:** Next.js
-- **Backend / Sunucu:** .NET Core API
-- **Veritabanı:** İlişkisel Veritabanı
-- **Yapay Zeka:** OpenAI API / Gemini API
+[![Frontend](https://img.shields.io/badge/Frontend-Vercel-black?logo=vercel)](https://yazilimmuh1-sxgy.vercel.app)
+[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?logo=render)](https://yazilimmuh1-1.onrender.com)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
+[![.NET](https://img.shields.io/badge/.NET-9-512BD4?logo=dotnet)](https://dotnet.microsoft.com)
 
-## Genel Konsept
-FluentBee, kullanıcıların seviyelerine uygun İngilizce dersleri alabildiği, kelime listeleri oluşturabildiği, sınavlarla kendilerini test edebildiği ve yapay zeka destekli İngilizce pratiği yapabildiği modern bir web platformudur.
+---
 
+## 🌐 Canlı Deployment Adresleri
 
-## Dokümantasyon
+| Servis | URL |
+|---|---|
+| 🖥️ **Web Frontend** | https://yazilimmuh1-sxgy.vercel.app |
+| 🔧 **REST API** | https://yazilimmuh1-1.onrender.com |
+| 📮 **Postman Koleksiyonu** | [FluentBee_API.postman_collection.json](./FluentBee_API.postman_collection.json) |
 
-Proje dokümantasyonuna aşağıdaki linklerden erişebilirsiniz:
+---
 
-1. [Gereksinim Analizi](#gereksinim-analizi)
-2. [REST API Tasarımı](API-Tasarimi.md)
+## 🛠️ Kullanılan Teknolojiler
 
-## Gereksinim Analizi
+| Katman | Teknoloji |
+|---|---|
+| Frontend | Next.js 15, TypeScript, Tailwind CSS |
+| Backend | .NET 9 Web API (C#) |
+| Veritabanı | SQLite (Render üzerinde kalıcı disk) |
+| Yapay Zeka | Google Gemini 2.0 Flash API |
+| CI/CD | GitHub → Vercel (Frontend) + Render (Backend) |
 
-Projemizdeki fonksiyonel gereksinimler, proje ekibi tarafından paylaşılmıştır. Sistem genelinde toplam **16 adet** temel fonksiyonel gereksinim belirlenmiştir:
+---
 
-### Enes Celal Yavuz Tarafından Üstlenilen Gereksinimler
-1. **Öğrenci Kayıt Olma** (POST API Metodu): Sisteme yeni bir kullanıcı hesabının oluşturulması.
-2. **Profil Güncelleme** (PUT API Metodu): Kullanıcının kendi ad, soyad ve şifre gibi kişisel bilgilerini değiştirmesi.
-3. **Kelimeleri Listeleme** (GET API Metodu): Sistemdeki tüm İngilizce kelimelerin Türkçe anlamlarıyla birlikte liste halinde ekrana getirilmesi.
-4. **Kelime Silme** (DELETE API Metodu): Kullanıcının kendi özel çalışma listesinden artık istemediği kelimeleri çıkarması.
-5. **Dersleri Listeleme** (GET API Metodu): İngilizce seviyelerine göre hazırlanmış ders modüllerinin seviye bazlı gösterilmesi.
-6. **Çalışma Hedefi Güncelleme** (PUT API Metodu): Kullanıcının uygulama üzerinde belirlediği günlük hedef çalışma süresini yeniden ayarlaması.
-7. **Favori Kelime Ekleme** (POST API Metodu): Öğrencinin çalışma listesine yepyeni bir İngilizce kelime kaydetmesi.
-8. **Öğrenme İstatistiklerini Görme** (GET API Metodu): Öğrencinin kaç kelime ezberlediğine ve hangi dersleri bitirdiğine dair verilerin sunulması.
+## 📁 Proje Yapısı
 
-### Ali Şeker Tarafından Üstlenilen Gereksinimler
-1. **Kursa Katılma** (POST API Metodu): Kullanıcının belirlediği bir İngilizce eğitim seviyesi kuruna kayıt olması.
-2. **Sınav Sonucu Ekleme** (POST API Metodu): Çözülen İngilizce deneme sınavı puanlarının ve cevaplarının hesaba kaydedilmesi.
-3. **Sınavları Listeleme** (GET API Metodu): Öğrencilerin İngilizce seviyelerini test edebilecekleri uygun sınavların dökümünün yapılması.
-4. **Sınav Puanı Güncelleme** (PUT API Metodu): Kullanıcının daha önce çözdüğü bir testi yeniden çözmesi durumunda güncel puanının değiştirilmesi.
-5. **Kullanıcı Hesabını Silme** (DELETE API Metodu): Kullanıcının üyelik sisteminden tüm kaydının ve ilerleme verilerinin kalıcı olarak silinmesi.
-6. **Yorum Silme** (DELETE API Metodu): Kullanıcının bir İngilizce dersine veya içeriğine yaptığı değerlendirme yorumunu siteden tamamen kaldırması.
-7. **Sertifikaları Görme** (GET API Metodu): Başarıyla bitirilen İngilizce eğitimlerinin dijital başarı belgelerinin kullanıcıya sunulması.
-8. **Yapay Zeka ile İngilizce Pratiği Yapma (+5 Puanlık Yapay Zeka Gereksinimi)** (POST API Metodu): Kullanıcının yazdığı İngilizce cümlelerin yapay zeka tarafından incelenip hatalarının düzeltilmesi ve geri bildirim verilmesi.
+```
+yazilimmuh1/
+├── frontend/          # Next.js Web Uygulaması
+├── backend/           # .NET Core REST API
+├── Ali-Seker/         # Ali Şeker görev dokümantasyonu
+├── Enes-Celal-Yavuz/  # Enes Celal Yavuz görev dokümantasyonu
+├── API-Tasarimi.md    # Tüm API endpoint dokümantasyonu
+└── FluentBee_API.postman_collection.json
+```
+
+---
+
+## 👥 Ekip & Gereksinimler
+
+### Enes Celal Yavuz
+| # | Gereksinim | Metot |
+|---|---|---|
+| 1 | Öğrenci Kayıt Olma | POST |
+| 2 | Profil Güncelleme | PUT |
+| 3 | Kelimeleri Listeleme | GET |
+| 4 | Kelime Silme (Favoriden) | DELETE |
+| 5 | Dersleri Listeleme | GET |
+| 6 | Çalışma Hedefi Güncelleme | PUT |
+| 7 | Favori Kelime Ekleme | POST |
+| 8 | Öğrenme İstatistiklerini Görme | GET |
+
+📂 [Enes'in Detaylı Görev Dosyaları →](./Enes-Celal-Yavuz/)
+
+### Ali Şeker
+| # | Gereksinim | Metot |
+|---|---|---|
+| 1 | Kursa Katılma | POST |
+| 2 | Sınav Sonucu Ekleme | POST |
+| 3 | Sınavları Listeleme | GET |
+| 4 | Sınav Puanı Güncelleme | PUT |
+| 5 | Kullanıcı Hesabını Silme | DELETE |
+| 6 | Yorum Silme | DELETE |
+| 7 | Sertifikaları Görme | GET |
+| 8 | **⭐ Yapay Zeka ile İngilizce Pratiği (+5 Puan)** | POST |
+
+📂 [Ali'nin Detaylı Görev Dosyaları →](./Ali-Seker/)
+
+---
+
+## 🚀 Özellikler
+
+- 📚 **Dersler** — Seviyeye göre filtrelenmiş İngilizce ders modülleri, Markdown içerik renderer
+- 📖 **Sözlük** — 50+ kelimelik sözlük, favori kelime ekleme/kaldırma, anlık arama
+- 🎓 **Sınavlar** — A1/B1/C1 seviye sınavları, otomatik puanlama, sertifika sistemi
+- 🤖 **AI Tutor** — Google Gemini ile anlık İngilizce dilbilgisi geri bildirimi
+- 👤 **Profil** — İstatistik gösterimi, ad/şifre güncelleme, sınav geçmişi, sertifika indirme
+- 💬 **Yorumlar** — Derslere yorum yapma, silme
+- 🏆 **Günlük Hedef** — Kullanıcı belirlediği günlük çalışma hedefine ulaşınca bildirim alır
+
+---
+
+## 📖 Dokümantasyon
+
+- [API Tasarımı](./API-Tasarimi.md)
+- [Deployment Kılavuzu](./DEPLOYMENT_GUIDE.md)
+- [REST API — Ali Şeker](./Ali-Seker/Ali-Seker-Rest-API-Gorevleri.md)
+- [REST API — Enes Celal Yavuz](./Enes-Celal-Yavuz/Enes-Celal-Yavuz-Rest-API-Gorevleri.md)
