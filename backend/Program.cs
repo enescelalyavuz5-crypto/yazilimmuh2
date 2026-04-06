@@ -42,9 +42,17 @@ if (app.Environment.IsDevelopment())
     }
 }
 
+app.UseCors("AllowAll");
+
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+// Run Seeder in all environments
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<FluentBee.Api.Data.ApplicationDbContext>();
+    FluentBee.Api.Data.DbSeeder.Seed(context);
+}
 
 app.UseAuthorization();
 
