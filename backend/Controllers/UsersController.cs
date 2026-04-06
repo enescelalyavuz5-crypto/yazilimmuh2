@@ -94,7 +94,7 @@ namespace FluentBee.Api.Controllers
             if (user == null) return NotFound();
 
             var memorizedWords = await _context.FavoriteWords.CountAsync(fw => fw.UserId == userId);
-            var completedLessons = await _context.ExamResults.CountAsync(er => er.UserId == userId); // using exam results count to simulate completed lessons
+            var completedLessons = await _context.Comments.CountAsync(c => c.UserId == userId && c.Content == "SYSTEM_COMPLETED"); 
 
             return Ok(new LearningStatisticsDto
             {

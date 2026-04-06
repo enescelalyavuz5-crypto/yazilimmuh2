@@ -66,23 +66,22 @@ namespace FluentBee.Api.Controllers
             if (lesson == null) return NotFound(new { message = "Ders bulunamadı." });
 
             // Aynı ders zaten tamamlanmış mı?
-            var alreadyDone = await _context.ExamResults
-                .AnyAsync(er => er.UserId == userId && er.ExamId == id);
+            var alreadyDone = await _context.Comments
+                .AnyAsync(c => c.UserId == userId && c.LessonId == id && c.Content == "SYSTEM_COMPLETED");
 
             if (alreadyDone)
                 return Ok(new { message = "Bu ders zaten tamamlanmış.", alreadyCompleted = true });
 
-            // ExamResults tablosunu lesson completion için de kullanıyoruz
-            var result = new ExamResult
+            // Comment tablosunu lesson completion için kullanıyoruz (Exam FK hatasını aşmak için)
+            var result = new Comment
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
-                ExamId = id, // lessonId kullanıyoruz
-                Score = 100,
-                AnswersJson = "[]",
-                CompletedAt = DateTime.UtcNow
+                LessonId = id,
+                Content = "SYSTEM_COMPLETED",
+                CreatedAt = DateTime.UtcNow
             };
-            _context.ExamResults.Add(result);
+            _context.Comments.Add(result);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Ders tamamlandı! 🎉", alreadyCompleted = false });

@@ -4,7 +4,6 @@ import { toast } from "react-hot-toast";
 
 export default function Profile() {
   const [stats, setStats] = useState({ memorizedWordsCount: 0, completedLessonsCount: 0 });
-  const [goal, setGoal] = useState(30);
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("Kullanıcı");
   const [favorites, setFavorites] = useState<any[]>([]);
@@ -66,39 +65,19 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Stats + Settings */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <span className="text-amber-400">📊</span> Learning Statistics
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-              <div className="text-4xl font-black text-white mb-2">{stats.memorizedWordsCount}</div>
-              <div className="text-sm text-neutral-400 uppercase tracking-wider font-bold">Memorized Words</div>
-            </div>
-            <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-              <div className="text-4xl font-black text-white mb-2">{stats.completedLessonsCount}</div>
-              <div className="text-sm text-neutral-400 uppercase tracking-wider font-bold">Completed Lessons</div>
-            </div>
+      {/* Stats */}
+      <div className="space-y-6 max-w-2xl">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
+          <span className="text-amber-400">📊</span> Learning Statistics
+        </h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+            <div className="text-4xl font-black text-white mb-2">{stats.memorizedWordsCount}</div>
+            <div className="text-sm text-neutral-400 uppercase tracking-wider font-bold">Memorized Words</div>
           </div>
-        </div>
-
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <span className="text-amber-400">⚙️</span> Profile Settings
-          </h2>
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-neutral-400 mb-1">Daily Study Goal (Minutes)</label>
-              <div className="flex gap-2">
-                <input type="number" value={goal} onChange={e => setGoal(parseInt(e.target.value))}
-                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none" />
-                <button className="bg-white/10 hover:bg-amber-500 hover:text-black font-bold px-4 py-2 rounded-lg transition-colors">
-                  Save
-                </button>
-              </div>
-            </div>
+          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+            <div className="text-4xl font-black text-white mb-2">{stats.completedLessonsCount}</div>
+            <div className="text-sm text-neutral-400 uppercase tracking-wider font-bold">Completed Lessons</div>
           </div>
         </div>
       </div>
