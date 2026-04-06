@@ -79,9 +79,14 @@ export default function Navbar() {
   }, [isLoggedIn, goal]); // pathname değişince de kontrol et
 
   const handleLogout = () => {
+    // Tüm kullanıcı verilerini temizle
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
     window.dispatchEvent(new Event("auth-change"));
     setIsLoggedIn(false);
+    setGoal(null);
     toast.success("Çıkış yapıldı.", { icon: '👋' });
     router.push("/");
   };

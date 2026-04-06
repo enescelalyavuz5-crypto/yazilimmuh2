@@ -94,17 +94,23 @@ namespace FluentBee.Api.Controllers
         {
             var comments = await _context.Comments
                 .Where(c => c.LessonId == lessonId && c.Content != "SYSTEM_COMPLETED")
-                .Include(c => c.User)
                 .OrderByDescending(c => c.CreatedAt)
-                .Select(c => new {
-                    c.Id,
-                    c.Content,
-                    c.CreatedAt,
-                    c.UserId,
-                    userName = (c.User != null ? c.User.FirstName + " " + c.User.LastName : "Anonim")
-                })
                 .ToListAsync();
-            return Ok(new { data = comments });
+
+            var userIds = comments.Select(c => c.UserId).Distinct().ToList();
+            var users = await _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToDictionaryAsync(u => u.Id, u => u.FirstName + " " + u.LastName);
+
+            var result = comments.Select(c => new {
+                c.Id,
+                c.Content,
+                c.CreatedAt,
+                c.UserId,
+                userName = users.ContainsKey(c.UserId) ? users[c.UserId] : "Anonim"
+            });
+
+            return Ok(new { data = result });
         }
 
         // POST /v1/lessons/{lessonId}/comments
