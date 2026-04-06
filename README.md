@@ -19,7 +19,7 @@
 [![Enes Celal Yavuz Demo](https://img.youtube.com/vi/Ffh-dk_AuI8/0.jpg)](https://www.youtube.com/watch?v=Ffh-dk_AuI8)
 
 ### 👤 Ali Şeker — Demo Videosu
-[![Ali Şeker Demo](https://www.youtube.com/watch?v=pAtnr2aewHQ)
+[![Ali Şeker Demo](https://youtu.be/pAtnr2aewHQ)
 
 ---
 
