@@ -23,7 +23,12 @@ export default function Register() {
         body: JSON.stringify(formData)
       });
       if (res.ok) {
+        const data = await res.json();
         localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userId", data.id || data.user?.id);
+        localStorage.setItem("userName", `${data.firstName || data.user?.firstName} ${data.lastName || data.user?.lastName}`);
+        localStorage.setItem("userEmail", data.email || data.user?.email);
+        window.dispatchEvent(new Event("auth-change"));
         toast.success("Kayıt Başarılı! Öğrenme yolculuğuna hoş geldin.", { icon: '🎓' });
         router.push("/profile");
       } else {
