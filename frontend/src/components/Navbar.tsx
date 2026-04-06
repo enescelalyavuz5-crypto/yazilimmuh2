@@ -10,6 +10,7 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [goal, setGoal] = useState<number | null>(null);
   const [spentSeconds, setSpentSeconds] = useState(0);
+  const [isActive, setIsActive] = useState(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const toastFiredRef = useRef(false);
   const goalRef = useRef<number | null>(null);
@@ -72,6 +73,11 @@ export default function Navbar() {
     setSpentSeconds(savedSeconds);
     if (savedSeconds >= goal * 60) toastFiredRef.current = true;
 
+    if (!isActive) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
     timerRef.current = setInterval(() => {
       setSpentSeconds(prev => {
         const next = prev + 1;
@@ -92,7 +98,16 @@ export default function Navbar() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isLoggedIn, goal]);
+  }, [isLoggedIn, goal, isActive]);
+
+  const resetTimer = () => {
+    if (!window.confirm("Günün çalışma süresini sıfırlamak istediğinden emin misin?")) return;
+    const today = new Date().toISOString().split("T")[0];
+    localStorage.setItem(`study_seconds_${today}`, "0");
+    setSpentSeconds(0);
+    toastFiredRef.current = false;
+    toast.success("Sayaç sıfırlandı.");
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
@@ -178,69 +193,7 @@ export default function Navbar() {
             {/* Sağ: Timer + Butonlar */}
             <div className="flex items-center gap-4">
 
-              {/* --- GÜNLÜK HEDEF SAYACI --- */}
-              {mounted && isLoggedIn && goal && (
-                <div
-                  className={`flex items-center gap-3 px-4 py-2 rounded-xl border transition-all duration-500 ${
-                    done
-                      ? "bg-emerald-500/15 border-emerald-400/40 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-                      : "bg-amber-500/10 border-amber-500/30"
-                  }`}
-                >
-                  {/* Radyal progress mini ring */}
-                  <div className="relative w-9 h-9 flex-shrink-0">
-                    <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                      <circle cx="18" cy="18" r="15" fill="none" strokeWidth="3"
-                        stroke={done ? "rgba(16,185,129,0.2)" : "rgba(245,158,11,0.2)"} />
-                      <circle cx="18" cy="18" r="15" fill="none" strokeWidth="3"
-                        stroke={done ? "#10B981" : "#f59e0b"}
-                        strokeLinecap="round"
-                        strokeDasharray={2 * Math.PI * 15}
-                        strokeDashoffset={2 * Math.PI * 15 * (1 - progressPercent / 100)}
-                        style={{ transition: "stroke-dashoffset 0.8s ease" }}
-                      />
-                    </svg>
-                    <span
-                      className="absolute inset-0 flex items-center justify-center text-[9px] font-black"
-                      style={{ color: done ? "#10B981" : "#f59e0b" }}
-                    >
-                      {done ? "✓" : `${Math.round(progressPercent)}%`}
-                    </span>
-                  </div>
-
-                  {/* Metin bilgisi */}
-                  <div className="flex flex-col leading-tight min-w-0">
-                    <span
-                      className="text-xs font-black tracking-wide"
-                      style={{ color: done ? "#10B981" : "#f59e0b" }}
-                    >
-                      {done ? "🏆 Tamamlandı!" : `⏱ ${timeStr}`}
-                    </span>
-                    <span className="text-[10px] text-neutral-500">
-                      {done
-                        ? `${goal} dk hedef aşıldı`
-                        : `/ ${goal} dk hedef`}
-                    </span>
-                  </div>
-
-                  {/* Progress bar — tam genişlikte */}
-                  <div className="hidden sm:block w-20 h-1.5 rounded-full overflow-hidden bg-white/10">
-                    <div
-                      className="h-full rounded-full transition-all duration-700"
-                      style={{
-                        width: `${progressPercent}%`,
-                        background: done
-                          ? "linear-gradient(90deg,#10B981,#34d399)"
-                          : "linear-gradient(90deg,#f59e0b,#fbbf24)",
-                        boxShadow: done
-                          ? "0 0 8px rgba(16,185,129,0.6)"
-                          : "0 0 8px rgba(245,158,11,0.5)"
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-              {/* ----------------------------- */}
+              {/* --- GÜNLÜK HEDEF SAYACI KALDIRILDI, FLOATING EKLENDI --- */}
 
               {!mounted ? null : isLoggedIn ? (
                 <button
@@ -281,6 +234,75 @@ export default function Navbar() {
           </div>
         )}
       </nav>
+
+      {/* --- DEV KRONOMETRE WIDGET (FLOATING) --- */}
+      {mounted && isLoggedIn && goal && (
+        <div className={`fixed bottom-6 right-6 z-[100] flex flex-col items-center bg-black/80 backdrop-blur-xl border-2 p-5 rounded-[2.5rem] transition-all duration-500 hover:scale-105 ${
+          done 
+            ? "border-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.3)]" 
+            : "border-amber-500 shadow-[0_0_40px_rgba(245,158,11,0.2)]"
+        }`}>
+          <div className="text-center mb-3">
+             <p className="text-[11px] font-black uppercase tracking-widest text-neutral-400">
+               {done ? "🔥 HEDEF TAMAM!" : "ÇALIŞMA SAYACI"}
+             </p>
+          </div>
+          
+          {/* Stopwatch Display */}
+          <div className="relative w-32 h-32 flex items-center justify-center bg-black/50 rounded-full border-[6px] border-white/5 mx-auto mb-4">
+             {/* Background Track */}
+             <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
+                 <circle cx="50" cy="50" r="46" fill="none" strokeWidth="6" stroke="rgba(255,255,255,0.05)" />
+                 {/* Foreground Progress */}
+                 <circle cx="50" cy="50" r="46" fill="none" strokeWidth="6" 
+                    stroke={done ? "#10B981" : "#f59e0b"} 
+                    strokeLinecap="round" 
+                    strokeDasharray={2 * Math.PI * 46} 
+                    strokeDashoffset={2 * Math.PI * 46 * (1 - progressPercent / 100)} 
+                    style={{ transition: "stroke-dashoffset 1s linear" }}
+                 />
+             </svg>
+             
+             {/* Time Text */}
+             <div className={`text-4xl font-black font-mono tracking-tighter z-10 ${done ? "text-emerald-400" : "text-amber-400"} filter drop-shadow-[0_0_10px_rgba(0,0,0,1)]`}>
+               {timeStr}
+             </div>
+          </div>
+
+          {/* Controls */}
+          <div className="flex gap-4 mb-4">
+             <button 
+                onClick={() => setIsActive(!isActive)}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                  isActive 
+                    ? "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30" 
+                    : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                }`}
+                title={isActive ? "Durdur" : "Başlat"}
+             >
+                {isActive ? (
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                ) : (
+                  <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                )}
+             </button>
+             <button 
+                onClick={resetTimer}
+                className="w-12 h-12 rounded-full bg-white/5 text-neutral-400 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition-all"
+                title="Sıfırla"
+             >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+             </button>
+          </div>
+
+          {/* Goal Display */}
+          <div className="bg-white/10 px-5 py-2 rounded-full border border-white/5">
+            <span className="text-sm font-bold text-white tracking-wide">
+              Hedef: <span className={done ? "text-emerald-400" : "text-amber-400"}>{goal} dk</span>
+            </span>
+          </div>
+        </div>
+      )}
     </>
   );
 }

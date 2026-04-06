@@ -19,6 +19,7 @@ export default function Profile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Exam & Cert States
   const [exams, setExams] = useState<any[]>([]);
@@ -109,14 +110,19 @@ export default function Profile() {
     if (!userId) return;
     setSavingProfile(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${userId}/profile`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${userId}/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firstName, lastName })
       });
+      if (!res.ok) throw new Error();
+      
       setUserName(`${firstName} ${lastName}`);
       localStorage.setItem("userName", `${firstName} ${lastName}`);
-      toast.success("İsim bilgileri güncellendi! ✅");
+      window.dispatchEvent(new Event("profile-updated"));
+      toast.success("İsim bilgileri güncellendi! ✅", {
+        style: { background: '#F59E0B', color: '#000', fontWeight: 'bold' }
+      });
     } catch {
       toast.error("İsim güncellenemedi.");
     } finally {
@@ -128,13 +134,17 @@ export default function Profile() {
     if (!userId) return;
     setSavingGoal(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${userId}/study-goal`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${userId}/study-goal`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dailyGoalMinutes: goal })
       });
+      if (!res.ok) throw new Error();
+
       window.dispatchEvent(new Event("goal-updated"));
-      toast.success(`Günlük hedef ${goal} dakika olarak kaydedildi! 🎯`);
+      toast.success(`Günlük hedef ${goal} dakika olarak kaydedildi! 🎯`, {
+        style: { background: '#10B981', color: '#000', fontWeight: 'bold' }
+      });
     } catch {
       toast.error("Hedef güncellenemedi.");
     } finally {
@@ -170,6 +180,32 @@ export default function Profile() {
       toast.error("Şifre değiştirilemedi.");
     } finally {
       setChangingPassword(false);
+    }
+  };
+
+  const deleteAccount = async () => {
+    if (!userId) return;
+    if (!window.confirm("Hesabını kalıcı olarak silmek istediğinden emin misin? Bu işlem GERİ ALINAMAZ!")) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/users/${userId}`, {
+        method: "DELETE"
+      });
+      if (res.ok) {
+        toast.success("Hesabın başarıyla silindi. Hoşça kal!", { icon: "👋" });
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("userEmail");
+        window.dispatchEvent(new Event("auth-change"));
+        window.location.href = "/";
+      } else {
+        toast.error("Hesap silinirken bir hata oluştu.");
+      }
+    } catch {
+      toast.error("Hesap silinemedi.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -237,10 +273,22 @@ export default function Profile() {
             {/* Günlük Hedef */}
             <div className="pt-2 border-t border-white/10">
               <label className="block text-sm font-bold text-neutral-300 mb-2">🎯 Günlük Çalışma Hedefi</label>
-              <div className="flex gap-2">
-                <input type="number" min="1" value={goal} onChange={e => setGoal(parseInt(e.target.value))}
-                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white" />
-                <span className="flex items-center text-sm text-neutral-400 whitespace-nowrap">dakika</span>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setGoal(prev => Math.max(1, prev - 5))}
+                  className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 active:scale-95 transition-all text-xl font-bold text-neutral-400"
+                >
+                  -
+                </button>
+                <input type="number" min="1" value={goal} onChange={e => setGoal(parseInt(e.target.value) || 1)}
+                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 outline-none text-white text-center font-bold" />
+                <button 
+                  onClick={() => setGoal(prev => prev + 5)}
+                  className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 active:scale-95 transition-all text-xl font-bold text-neutral-400"
+                >
+                  +
+                </button>
+                <span className="flex items-center text-sm text-neutral-400 whitespace-nowrap ml-1">dakika</span>
               </div>
               <button onClick={saveGoal} disabled={savingGoal}
                 className="mt-3 w-full bg-emerald-500/20 hover:bg-emerald-500 hover:text-black border border-emerald-500/50 text-emerald-400 font-bold px-6 py-2 rounded-lg transition-all disabled:opacity-50">
@@ -375,12 +423,12 @@ export default function Profile() {
         </h2>
         <div className="p-6 rounded-2xl bg-red-500/5 border border-red-500/20 backdrop-blur-md flex items-center justify-between">
           <div>
-            <p className="font-semibold text-white">Delete Account</p>
-            <p className="text-sm text-neutral-400">This action is permanent and cannot be undone.</p>
-          </div>
-          <button className="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 font-bold px-6 py-2 rounded-lg transition-all duration-200">
-            Delete Account
-          </button>
+             <p className="font-semibold text-white">Hesabı Sil</p>
+             <p className="text-sm text-neutral-400">Bu işlem kalıcıdır ve geri alınamaz.</p>
+           </div>
+           <button onClick={deleteAccount} disabled={isDeleting} className="bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 border border-red-500/30 font-bold px-6 py-2 rounded-lg transition-all duration-200 disabled:opacity-50">
+             {isDeleting ? "Siliniyor..." : "Hesabı Sil"}
+           </button>
         </div>
       </div>
 
