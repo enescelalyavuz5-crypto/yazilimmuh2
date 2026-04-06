@@ -32,11 +32,12 @@ export default function Register() {
         toast.success("Kayıt Başarılı! Öğrenme yolculuğuna hoş geldin.", { icon: '🎓' });
         router.push("/profile");
       } else {
-        toast.error("Kayıt işlemi başarısız oldu. Girdiğin bilgileri kontrol et.");
+        const errData = await res.json().catch(() => null);
+        toast.error(errData?.message || "Kayıt işlemi başarısız oldu. Lütfen tekrar dene.");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Sunucuya bağlanılamadı.");
+      toast.error("Sunucuya bağlanılamadı. Lütfen internetini kontrol et.");
     }
   };
 
