@@ -272,6 +272,7 @@ export default function Navbar() {
           {/* Controls */}
           <div className="flex gap-4 mb-4">
              <button 
+                type="button"
                 onClick={() => setIsActive(!isActive)}
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                   isActive 
@@ -281,17 +282,18 @@ export default function Navbar() {
                 title={isActive ? "Durdur" : "Başlat"}
              >
                 {isActive ? (
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  <svg className="w-6 h-6 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                 ) : (
-                  <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  <svg className="w-6 h-6 ml-1 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 )}
              </button>
              <button 
+                type="button"
                 onClick={resetTimer}
                 className="w-12 h-12 rounded-full bg-white/5 text-neutral-400 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition-all"
                 title="Sıfırla"
              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <svg className="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
              </button>
           </div>
 

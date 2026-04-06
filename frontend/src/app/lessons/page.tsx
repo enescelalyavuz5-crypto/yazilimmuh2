@@ -91,7 +91,11 @@ export default function Lessons() {
     }
   };
 
-  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    setUserId(localStorage.getItem("userId"));
+  }, []);
 
   useEffect(() => {
     const url = levelFilter

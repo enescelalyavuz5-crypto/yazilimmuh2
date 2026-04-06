@@ -14,7 +14,11 @@ export default function Exams() {
   const [result, setResult] = useState<ResultData | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserId(localStorage.getItem("userId"));
+  }, []);
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050'}/v1/exams?limit=10`)
