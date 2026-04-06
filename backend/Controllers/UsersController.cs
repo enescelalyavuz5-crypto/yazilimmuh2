@@ -180,6 +180,22 @@ namespace FluentBee.Api.Controllers
         {
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return NotFound();
+
+            var examResults = await _context.ExamResults.Where(x => x.UserId == userId).ToListAsync();
+            _context.ExamResults.RemoveRange(examResults);
+            
+            var userCourses = await _context.UserCourses.Where(x => x.UserId == userId).ToListAsync();
+            _context.UserCourses.RemoveRange(userCourses);
+
+            var comments = await _context.Comments.Where(x => x.UserId == userId).ToListAsync();
+            _context.Comments.RemoveRange(comments);
+
+            var certs = await _context.Certificates.Where(x => x.UserId == userId).ToListAsync();
+            _context.Certificates.RemoveRange(certs);
+
+            var favorites = await _context.FavoriteWords.Where(x => x.UserId == userId).ToListAsync();
+            _context.FavoriteWords.RemoveRange(favorites);
+
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return NoContent();

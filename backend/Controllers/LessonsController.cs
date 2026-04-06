@@ -82,9 +82,26 @@ namespace FluentBee.Api.Controllers
                 CreatedAt = DateTime.UtcNow
             };
             _context.Comments.Add(result);
+
+            // Ders bitiminde sertifika ver
+            var certTitle = $"{lesson.Title} Başarı Sertifikası";
+            var hasCert = await _context.Certificates.AnyAsync(c => c.UserId == userId && c.Title == certTitle);
+            if (!hasCert)
+            {
+                var cert = new Certificate
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    Title = certTitle,
+                    Issuer = "FluentBee Learning",
+                    IssuedAt = DateTime.UtcNow
+                };
+                _context.Certificates.Add(cert);
+            }
+
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Ders tamamlandı! 🎉", alreadyCompleted = false });
+            return Ok(new { message = "Ders tamamlandı! 🎉 Sertifikanız profilinize eklendi.", alreadyCompleted = false });
         }
 
 

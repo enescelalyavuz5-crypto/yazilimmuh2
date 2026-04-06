@@ -13,8 +13,8 @@ namespace FluentBee.Api.Models
 
     public class ProfileUpdateDto
     {
-        [MinLength(2)] public string? FirstName { get; set; }
-        [MinLength(2)] public string? LastName { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
         public string? Password { get; set; }
     }
 
