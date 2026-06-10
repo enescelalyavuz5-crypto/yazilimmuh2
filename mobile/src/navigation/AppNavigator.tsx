@@ -11,6 +11,12 @@ import ProfileScreen from '../screens/ProfileScreen';
 import WordsScreen from '../screens/WordsScreen';
 import LessonsScreen from '../screens/LessonsScreen';
 
+import CoursesScreen from '../screens/CoursesScreen';
+import ExamsScreen from '../screens/ExamsScreen';
+import ExamTakeScreen from '../screens/ExamTakeScreen';
+import CertificatesScreen from '../screens/CertificatesScreen';
+import AIPracticeScreen from '../screens/AIPracticeScreen';
+
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -47,6 +53,11 @@ export default function AppNavigator() {
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="Words" component={WordsScreen} />
             <Stack.Screen name="Lessons" component={LessonsScreen} />
+            <Stack.Screen name="Courses" component={CoursesScreen} />
+            <Stack.Screen name="Exams" component={ExamsScreen} />
+            <Stack.Screen name="ExamTake" component={ExamTakeScreen} options={{ title: 'Take Exam' }} />
+            <Stack.Screen name="Certificates" component={CertificatesScreen} />
+            <Stack.Screen name="AIPractice" component={AIPracticeScreen} options={{ title: 'AI Practice' }} />
           </>
         )}
       </Stack.Navigator>
