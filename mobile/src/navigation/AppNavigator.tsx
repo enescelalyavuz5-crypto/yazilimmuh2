@@ -2,22 +2,16 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuthStore } from '../store/authStore';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
+
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import MainScreen from '../screens/MainScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import WordsScreen from '../screens/WordsScreen';
+import LessonsScreen from '../screens/LessonsScreen';
 
 const Stack = createNativeStackNavigator();
-
-// Temporary placeholders until branches are merged
-const AuthPlaceholder = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Auth Placeholder</Text>
-  </View>
-);
-
-const HomePlaceholder = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Home Placeholder</Text>
-  </View>
-);
 
 export default function AppNavigator() {
   const { token, restoreToken } = useAuthStore();
@@ -41,13 +35,19 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator>
         {token == null ? (
-          // Auth screens
-          <Stack.Screen name="Auth" component={AuthPlaceholder} />
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
+          </>
         ) : (
-          // App screens
-          <Stack.Screen name="Main" component={HomePlaceholder} />
+          <>
+            <Stack.Screen name="Main" component={MainScreen} options={{ title: 'FluentBee' }} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Words" component={WordsScreen} />
+            <Stack.Screen name="Lessons" component={LessonsScreen} />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
