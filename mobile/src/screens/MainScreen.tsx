@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Button, ActivityIndicator, ScrollView } from 'react-native';
 import { useAuthStore } from '../store/authStore';
 import { enesApi } from '../api/enesApi';
 
@@ -21,7 +21,7 @@ export default function MainScreen({ navigation }: any) {
   }, [user]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Welcome, {user?.firstName}!</Text>
       
       <View style={styles.statsContainer}>
@@ -40,8 +40,16 @@ export default function MainScreen({ navigation }: any) {
         <Button title="Words" onPress={() => navigation.navigate('Words')} />
         <View style={{ height: 10 }} />
         <Button title="Lessons" onPress={() => navigation.navigate('Lessons')} />
+        <View style={{ height: 10 }} />
+        <Button title="Courses" onPress={() => navigation.navigate('Courses')} />
+        <View style={{ height: 10 }} />
+        <Button title="Exams" onPress={() => navigation.navigate('Exams')} />
+        <View style={{ height: 10 }} />
+        <Button title="Certificates" onPress={() => navigation.navigate('Certificates')} />
+        <View style={{ height: 10 }} />
+        <Button title="AI Practice" onPress={() => navigation.navigate('AIPractice')} />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -50,5 +58,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   subtitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
   statsContainer: { padding: 15, backgroundColor: '#f0f0f0', borderRadius: 8, marginBottom: 30 },
-  menuContainer: { flex: 1 }
+  menuContainer: { flex: 1, paddingBottom: 40 }
 });
